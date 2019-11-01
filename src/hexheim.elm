@@ -20,6 +20,7 @@ import Svg.Attributes exposing (..)
 import Svg.Events exposing (..)
 import Svg.Lazy exposing (lazy, lazy2, lazy3)
 import Task
+import VirtualDom exposing (attribute)
 
 
 main : Program () Model Msg
@@ -112,6 +113,18 @@ darkblue =
     Element.rgb255 29 53 87
 
 
+watergray =
+    "#86a39c"
+
+
+landgray =
+    "#b7af92"
+
+
+bordergray =
+    "#5a6046"
+
+
 type Zoom
     = Factor Float
     | Normal
@@ -145,7 +158,8 @@ type alias Model =
     , typeMap : TypeMap
     , viewBoxX : Float
     , viewBoxY : Float
-    , zoom : Zipper Zoom
+    , zoom : Zoom
+    , zoomChoice : Float
     }
 
 
@@ -160,7 +174,8 @@ emptyModel =
         }
     , viewBoxX = 0
     , viewBoxY = 0
-    , zoom = List.Zipper.from [ Factor 2.5, Factor 2, Factor 1.5, Factor 1.3, Factor 1.1 ] Normal [ Factor 0.5 ]
+    , zoom = Factor 0.9
+    , zoomChoice = 0.9
     }
 
 
@@ -181,8 +196,7 @@ type Msg
     | PanLeft
     | PanRight
     | ResetView
-    | ZoomOut
-    | ZoomIn
+    | ZoomSliderChange Float
 
 
 addHexType : Hash -> CellType -> TypeMap -> TypeMap
@@ -221,14 +235,11 @@ update msg model =
         PanRight ->
             ( { model | viewBoxX = model.viewBoxX - 10 }, Cmd.none )
 
-        ZoomIn ->
-            ( { model | zoom = withDefault model.zoom (List.Zipper.previous model.zoom) }, Cmd.none )
-
-        ZoomOut ->
-            ( { model | zoom = withDefault model.zoom (List.Zipper.next model.zoom) }, Cmd.none )
+        ZoomSliderChange f ->
+            ( { model | zoom = Factor f, zoomChoice = f }, Cmd.none )
 
         ResetView ->
-            ( { model | viewBoxX = 0, viewBoxY = 0, zoom = withDefault model.zoom (List.Zipper.find normalZoom model.zoom) }, Cmd.none )
+            ( model, Cmd.none )
 
 
 
@@ -270,7 +281,7 @@ viewBoxStringCoords model =
         height =
             (cellHeight * rows) + (0.5 * cellHeight)
     in
-    case List.Zipper.current model.zoom of
+    case model.zoom of
         Normal ->
             String.fromFloat model.viewBoxX
                 ++ " "
@@ -356,8 +367,18 @@ view model =
                                 , Input.button [ Background.color lightgrey, Element.width <| Element.px 45 ] { onPress = Just PanLeft, label = Element.el [ Element.centerX, Element.centerY ] <| Element.text ">" }
                                 ]
                             , Element.row [ Element.spacing 10, Element.padding 10, Element.width Element.fill, Element.height <| Element.px 50 ]
-                                [ Input.button [ Background.color lightgrey, Element.padding 10 ] { onPress = Just ZoomIn, label = Element.el [ Element.centerX, Element.centerY ] <| Element.text "Zoom In" }
-                                , Input.button [ Background.color lightgrey, Element.padding 10 ] { onPress = Just ZoomOut, label = Element.el [ Element.centerX, Element.centerY ] <| Element.text "Zoom Out" }
+                                [ Input.slider
+                                    [ Background.color lightgrey
+                                    , Element.padding 10
+                                    ]
+                                    { onChange = ZoomSliderChange
+                                    , label = Input.labelAbove [] <| Element.text ("Zoom (" ++ String.fromFloat model.zoomChoice ++ ")")
+                                    , min = 0.1
+                                    , max = 5.0
+                                    , value = model.zoomChoice
+                                    , thumb = Input.defaultThumb
+                                    , step = Just 0.1
+                                    }
                                 ]
                             , Element.row [ Element.spacing 10, Element.padding 10, Element.width Element.fill, Element.height <| Element.px 50 ]
                                 [ Input.button [ Background.color lightgrey, Element.padding 10 ] { onPress = Just ResetView, label = Element.el [ Element.centerX, Element.centerY ] <| Element.text "Reset View" }
@@ -380,23 +401,6 @@ view model =
                         ]
                     ]
     }
-
-
-
--- , Html.button [ onClick PanUp ]
---     [ Html.text "^" ]
--- , Html.button [ onClick PanDown ]
---     [ Html.text "v" ]
--- , Html.button [ onClick PanRight ]
---     [ Html.text ">" ]
--- , Html.button [ onClick PanLeft ]
---     [ Html.text "<" ]
--- , Html.button [ onClick PanReset ]
---     [ Html.text "center" ]
--- , Html.button [ onClick ZoomIn ]
---     [ Html.text "+" ]
--- , Html.button [ onClick ZoomOut ]
---     [ Html.text "-" ]
 
 
 hexGrid : Model -> Html Msg
@@ -502,12 +506,13 @@ toPolygon : Hash -> String -> List (Svg Msg)
 toPolygon hexLocation cornersCoords =
     [ polygon
         [ Svg.Attributes.style "cursor: pointer"
-        , stroke "#444444"
-        , strokeWidth "0.35px"
-        , fill "#ffffff"
-        , fillOpacity "0"
+        , attribute "vector-effect" "non-scaling-size"
+        , stroke "#000000"
+        , strokeWidth "2px"
+        , fill watergray
+        , strokeOpacity "0.1"
         , points cornersCoords
-        , Svg.Events.onClick <|
+        , Svg.Events.onMouseDown <|
             SetHex hexLocation
         ]
         []
@@ -518,11 +523,13 @@ grassView : Hash -> String -> List (Svg Msg)
 grassView hexLocation cornersCoords =
     [ polygon
         [ Svg.Attributes.style "cursor: pointer"
+        , attribute "vector-effect" "non-scaling-size"
         , stroke "#003400"
-        , strokeWidth "1px"
-        , fill "#00ff00"
+        , strokeWidth "2px"
+        , fill landgray
         , points cornersCoords
-        , Svg.Events.onClick <|
+        , strokeOpacity "0.6"
+        , Svg.Events.onMouseDown <|
             SetHex hexLocation
         ]
         []
