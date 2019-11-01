@@ -4360,7 +4360,6 @@ function _Browser_load(url)
 var author$project$MapExample$Factor = function (a) {
 	return {$: 'Factor', a: a};
 };
-var author$project$MapExample$Normal = {$: 'Normal'};
 var author$project$MapExample$Void = {$: 'Void'};
 var elm$core$Basics$EQ = {$: 'EQ'};
 var elm$core$Basics$GT = {$: 'GT'};
@@ -4870,6 +4869,7 @@ var author$project$MapExample$rectangularFlatTopMap = F2(
 var author$project$MapExample$SetHex = function (a) {
 	return {$: 'SetHex', a: a};
 };
+var author$project$MapExample$landgray = '#b7af92';
 var elm$core$Basics$identity = function (x) {
 	return x;
 };
@@ -5231,6 +5231,7 @@ var elm$svg$Svg$polygon = elm$svg$Svg$trustedNode('polygon');
 var elm$svg$Svg$Attributes$fill = _VirtualDom_attribute('fill');
 var elm$svg$Svg$Attributes$points = _VirtualDom_attribute('points');
 var elm$svg$Svg$Attributes$stroke = _VirtualDom_attribute('stroke');
+var elm$svg$Svg$Attributes$strokeOpacity = _VirtualDom_attribute('stroke-opacity');
 var elm$svg$Svg$Attributes$strokeWidth = _VirtualDom_attribute('stroke-width');
 var elm$svg$Svg$Attributes$style = _VirtualDom_attribute('style');
 var elm$virtual_dom$VirtualDom$Normal = function (a) {
@@ -5244,12 +5245,19 @@ var elm$html$Html$Events$on = F2(
 			event,
 			elm$virtual_dom$VirtualDom$Normal(decoder));
 	});
-var elm$svg$Svg$Events$onClick = function (msg) {
+var elm$svg$Svg$Events$onMouseDown = function (msg) {
 	return A2(
 		elm$html$Html$Events$on,
-		'click',
+		'mousedown',
 		elm$json$Json$Decode$succeed(msg));
 };
+var elm$virtual_dom$VirtualDom$attribute = F2(
+	function (key, value) {
+		return A2(
+			_VirtualDom_attribute,
+			_VirtualDom_noOnOrFormAction(key),
+			_VirtualDom_noJavaScriptOrHtmlUri(value));
+	});
 var author$project$MapExample$grassView = F2(
 	function (hexLocation, cornersCoords) {
 		return _List_fromArray(
@@ -5259,17 +5267,19 @@ var author$project$MapExample$grassView = F2(
 				_List_fromArray(
 					[
 						elm$svg$Svg$Attributes$style('cursor: pointer'),
+						A2(elm$virtual_dom$VirtualDom$attribute, 'vector-effect', 'non-scaling-size'),
 						elm$svg$Svg$Attributes$stroke('#003400'),
-						elm$svg$Svg$Attributes$strokeWidth('1px'),
-						elm$svg$Svg$Attributes$fill('#00ff00'),
+						elm$svg$Svg$Attributes$strokeWidth('2px'),
+						elm$svg$Svg$Attributes$fill(author$project$MapExample$landgray),
 						elm$svg$Svg$Attributes$points(cornersCoords),
-						elm$svg$Svg$Events$onClick(
+						elm$svg$Svg$Attributes$strokeOpacity('0.6'),
+						elm$svg$Svg$Events$onMouseDown(
 						author$project$MapExample$SetHex(hexLocation))
 					]),
 				_List_Nil)
 			]);
 	});
-var elm$svg$Svg$Attributes$fillOpacity = _VirtualDom_attribute('fill-opacity');
+var author$project$MapExample$watergray = '#86a39c';
 var author$project$MapExample$toPolygon = F2(
 	function (hexLocation, cornersCoords) {
 		return _List_fromArray(
@@ -5279,12 +5289,13 @@ var author$project$MapExample$toPolygon = F2(
 				_List_fromArray(
 					[
 						elm$svg$Svg$Attributes$style('cursor: pointer'),
-						elm$svg$Svg$Attributes$stroke('#444444'),
-						elm$svg$Svg$Attributes$strokeWidth('0.35px'),
-						elm$svg$Svg$Attributes$fill('#ffffff'),
-						elm$svg$Svg$Attributes$fillOpacity('0'),
+						A2(elm$virtual_dom$VirtualDom$attribute, 'vector-effect', 'non-scaling-size'),
+						elm$svg$Svg$Attributes$stroke('#000000'),
+						elm$svg$Svg$Attributes$strokeWidth('2px'),
+						elm$svg$Svg$Attributes$fill(author$project$MapExample$watergray),
+						elm$svg$Svg$Attributes$strokeOpacity('0.1'),
 						elm$svg$Svg$Attributes$points(cornersCoords),
-						elm$svg$Svg$Events$onClick(
+						elm$svg$Svg$Events$onMouseDown(
 						author$project$MapExample$SetHex(hexLocation))
 					]),
 				_List_Nil)
@@ -5297,39 +5308,14 @@ var author$project$MapExample$typeView = function (ctype) {
 		return author$project$MapExample$toPolygon;
 	}
 };
-var wernerdegroot$listzipper$List$Zipper$Zipper = F3(
-	function (a, b, c) {
-		return {$: 'Zipper', a: a, b: b, c: c};
-	});
-var wernerdegroot$listzipper$List$Zipper$from = F3(
-	function (bef, curr, aft) {
-		return A3(
-			wernerdegroot$listzipper$List$Zipper$Zipper,
-			elm$core$List$reverse(bef),
-			curr,
-			aft);
-	});
 var author$project$MapExample$emptyModel = {
 	gridLayout: author$project$MapExample$layout,
 	map: A2(author$project$MapExample$rectangularFlatTopMap, author$project$MapExample$mapHeight, author$project$MapExample$mapWidth),
 	typeMap: {hexType: elm$core$Dict$empty, typeView: author$project$MapExample$typeView, _void: author$project$MapExample$Void},
 	viewBoxX: 0,
 	viewBoxY: 0,
-	zoom: A3(
-		wernerdegroot$listzipper$List$Zipper$from,
-		_List_fromArray(
-			[
-				author$project$MapExample$Factor(2.5),
-				author$project$MapExample$Factor(2),
-				author$project$MapExample$Factor(1.5),
-				author$project$MapExample$Factor(1.3),
-				author$project$MapExample$Factor(1.1)
-			]),
-		author$project$MapExample$Normal,
-		_List_fromArray(
-			[
-				author$project$MapExample$Factor(0.5)
-			]))
+	zoom: author$project$MapExample$Factor(0.9),
+	zoomChoice: 0.9
 };
 var elm$core$Platform$Cmd$batch = _Platform_batch;
 var elm$core$Platform$Cmd$none = elm$core$Platform$Cmd$batch(_List_Nil);
@@ -5350,80 +5336,6 @@ var author$project$MapExample$addHexType = F3(
 				hexType: A3(elm$core$Dict$insert, hexh, ctype, tmap.hexType)
 			});
 	});
-var author$project$MapExample$normalZoom = function (z) {
-	if (z.$ === 'Normal') {
-		return true;
-	} else {
-		return false;
-	}
-};
-var elm$core$Maybe$withDefault = F2(
-	function (_default, maybe) {
-		if (maybe.$ === 'Just') {
-			var value = maybe.a;
-			return value;
-		} else {
-			return _default;
-		}
-	});
-var wernerdegroot$listzipper$List$Zipper$next = function (_n0) {
-	var ls = _n0.a;
-	var x = _n0.b;
-	var rs = _n0.c;
-	if (!rs.b) {
-		return elm$core$Maybe$Nothing;
-	} else {
-		var y = rs.a;
-		var ys = rs.b;
-		return elm$core$Maybe$Just(
-			A3(
-				wernerdegroot$listzipper$List$Zipper$Zipper,
-				A2(elm$core$List$cons, x, ls),
-				y,
-				ys));
-	}
-};
-var wernerdegroot$listzipper$List$Zipper$find = F2(
-	function (predicate, zipper) {
-		find:
-		while (true) {
-			var ls = zipper.a;
-			var x = zipper.b;
-			var rs = zipper.c;
-			if (predicate(x)) {
-				return elm$core$Maybe$Just(zipper);
-			} else {
-				var _n0 = wernerdegroot$listzipper$List$Zipper$next(zipper);
-				if (_n0.$ === 'Just') {
-					var nextZipper = _n0.a;
-					var $temp$predicate = predicate,
-						$temp$zipper = nextZipper;
-					predicate = $temp$predicate;
-					zipper = $temp$zipper;
-					continue find;
-				} else {
-					return elm$core$Maybe$Nothing;
-				}
-			}
-		}
-	});
-var wernerdegroot$listzipper$List$Zipper$previous = function (_n0) {
-	var ls = _n0.a;
-	var x = _n0.b;
-	var rs = _n0.c;
-	if (!ls.b) {
-		return elm$core$Maybe$Nothing;
-	} else {
-		var y = ls.a;
-		var ys = ls.b;
-		return elm$core$Maybe$Just(
-			A3(
-				wernerdegroot$listzipper$List$Zipper$Zipper,
-				ys,
-				y,
-				A2(elm$core$List$cons, x, rs)));
-	}
-};
 var author$project$MapExample$update = F2(
 	function (msg, model) {
 		switch (msg.$) {
@@ -5462,41 +5374,18 @@ var author$project$MapExample$update = F2(
 						model,
 						{viewBoxX: model.viewBoxX - 10}),
 					elm$core$Platform$Cmd$none);
-			case 'ZoomIn':
+			case 'ZoomSliderChange':
+				var f = msg.a;
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
 						{
-							zoom: A2(
-								elm$core$Maybe$withDefault,
-								model.zoom,
-								wernerdegroot$listzipper$List$Zipper$previous(model.zoom))
-						}),
-					elm$core$Platform$Cmd$none);
-			case 'ZoomOut':
-				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{
-							zoom: A2(
-								elm$core$Maybe$withDefault,
-								model.zoom,
-								wernerdegroot$listzipper$List$Zipper$next(model.zoom))
+							zoom: author$project$MapExample$Factor(f),
+							zoomChoice: f
 						}),
 					elm$core$Platform$Cmd$none);
 			default:
-				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{
-							viewBoxX: 0,
-							viewBoxY: 0,
-							zoom: A2(
-								elm$core$Maybe$withDefault,
-								model.zoom,
-								A2(wernerdegroot$listzipper$List$Zipper$find, author$project$MapExample$normalZoom, model.zoom))
-						}),
-					elm$core$Platform$Cmd$none);
+				return _Utils_Tuple2(model, elm$core$Platform$Cmd$none);
 		}
 	});
 var author$project$MapExample$PanDown = {$: 'PanDown'};
@@ -5504,8 +5393,9 @@ var author$project$MapExample$PanLeft = {$: 'PanLeft'};
 var author$project$MapExample$PanRight = {$: 'PanRight'};
 var author$project$MapExample$PanUp = {$: 'PanUp'};
 var author$project$MapExample$ResetView = {$: 'ResetView'};
-var author$project$MapExample$ZoomIn = {$: 'ZoomIn'};
-var author$project$MapExample$ZoomOut = {$: 'ZoomOut'};
+var author$project$MapExample$ZoomSliderChange = function (a) {
+	return {$: 'ZoomSliderChange', a: a};
+};
 var mdgriffith$elm_ui$Internal$Model$Rgba = F4(
 	function (a, b, c, d) {
 		return {$: 'Rgba', a: a, b: b, c: c, d: d};
@@ -5736,10 +5626,6 @@ var author$project$MapExample$lightgrey = A3(mdgriffith$elm_ui$Element$rgb255, 2
 var author$project$MapExample$mint = A3(mdgriffith$elm_ui$Element$rgb255, 241, 250, 238);
 var author$project$MapExample$svgHeight = 600;
 var author$project$MapExample$svgWidth = 800;
-var wernerdegroot$listzipper$List$Zipper$current = function (_n0) {
-	var x = _n0.b;
-	return x;
-};
 var author$project$MapExample$viewBoxStringCoords = function (model) {
 	var sizeWidth = author$project$MapExample$layout.size.a;
 	var sizeHeight = author$project$MapExample$layout.size.b;
@@ -5749,7 +5635,7 @@ var author$project$MapExample$viewBoxStringCoords = function (model) {
 	var width = (cols * (0.75 * cellWidth)) + (0.25 * cellWidth);
 	var cellHeight = elm$core$Basics$sqrt(3) * sizeHeight;
 	var height = (cellHeight * rows) + (0.5 * cellHeight);
-	var _n0 = wernerdegroot$listzipper$List$Zipper$current(model.zoom);
+	var _n0 = model.zoom;
 	if (_n0.$ === 'Normal') {
 		return elm$core$String$fromFloat(model.viewBoxX) + (' ' + (elm$core$String$fromFloat(model.viewBoxY) + (' ' + (elm$core$String$fromFloat(width) + (' ' + elm$core$String$fromFloat(height))))));
 	} else {
@@ -5993,6 +5879,15 @@ var elm$core$Set$member = F2(
 	function (key, _n0) {
 		var dict = _n0.a;
 		return A2(elm$core$Dict$member, key, dict);
+	});
+var elm$core$Maybe$withDefault = F2(
+	function (_default, maybe) {
+		if (maybe.$ === 'Just') {
+			var value = maybe.a;
+			return value;
+		} else {
+			return _default;
+		}
 	});
 var mdgriffith$elm_ui$Internal$Model$lengthClassName = function (x) {
 	switch (x.$) {
@@ -9749,13 +9644,6 @@ var mdgriffith$elm_ui$Internal$Model$createElement = F3(
 			}
 		}
 	});
-var elm$virtual_dom$VirtualDom$attribute = F2(
-	function (key, value) {
-		return A2(
-			_VirtualDom_attribute,
-			_VirtualDom_noOnOrFormAction(key),
-			_VirtualDom_noJavaScriptOrHtmlUri(value));
-	});
 var elm$core$Bitwise$or = _Bitwise_or;
 var mdgriffith$elm_ui$Internal$Flag$add = F2(
 	function (myFlag, _n0) {
@@ -11799,6 +11687,661 @@ var mdgriffith$elm_ui$Element$Input$button = F2(
 				_List_fromArray(
 					[label])));
 	});
+var mdgriffith$elm_ui$Element$rgb = F3(
+	function (r, g, b) {
+		return A4(mdgriffith$elm_ui$Internal$Model$Rgba, r, g, b, 1);
+	});
+var mdgriffith$elm_ui$Internal$Flag$borderRound = mdgriffith$elm_ui$Internal$Flag$flag(17);
+var mdgriffith$elm_ui$Element$Border$rounded = function (radius) {
+	return A2(
+		mdgriffith$elm_ui$Internal$Model$StyleClass,
+		mdgriffith$elm_ui$Internal$Flag$borderRound,
+		A3(
+			mdgriffith$elm_ui$Internal$Model$Single,
+			'br-' + elm$core$String$fromInt(radius),
+			'border-radius',
+			elm$core$String$fromInt(radius) + 'px'));
+};
+var mdgriffith$elm_ui$Element$Input$Thumb = function (a) {
+	return {$: 'Thumb', a: a};
+};
+var mdgriffith$elm_ui$Element$Input$defaultThumb = mdgriffith$elm_ui$Element$Input$Thumb(
+	_List_fromArray(
+		[
+			mdgriffith$elm_ui$Element$width(
+			mdgriffith$elm_ui$Element$px(16)),
+			mdgriffith$elm_ui$Element$height(
+			mdgriffith$elm_ui$Element$px(16)),
+			mdgriffith$elm_ui$Element$Border$rounded(8),
+			mdgriffith$elm_ui$Element$Border$width(1),
+			mdgriffith$elm_ui$Element$Border$color(
+			A3(mdgriffith$elm_ui$Element$rgb, 0.5, 0.5, 0.5)),
+			mdgriffith$elm_ui$Element$Background$color(
+			A3(mdgriffith$elm_ui$Element$rgb, 1, 1, 1))
+		]));
+var mdgriffith$elm_ui$Element$Input$Above = {$: 'Above'};
+var mdgriffith$elm_ui$Element$Input$Label = F3(
+	function (a, b, c) {
+		return {$: 'Label', a: a, b: b, c: c};
+	});
+var mdgriffith$elm_ui$Element$Input$labelAbove = mdgriffith$elm_ui$Element$Input$Label(mdgriffith$elm_ui$Element$Input$Above);
+var elm$core$String$toFloat = _String_toFloat;
+var elm$html$Html$Attributes$attribute = elm$virtual_dom$VirtualDom$attribute;
+var elm$html$Html$Attributes$max = elm$html$Html$Attributes$stringProperty('max');
+var elm$html$Html$Attributes$min = elm$html$Html$Attributes$stringProperty('min');
+var elm$html$Html$Attributes$step = function (n) {
+	return A2(elm$html$Html$Attributes$stringProperty, 'step', n);
+};
+var elm$html$Html$Attributes$type_ = elm$html$Html$Attributes$stringProperty('type');
+var elm$html$Html$Attributes$value = elm$html$Html$Attributes$stringProperty('value');
+var elm$html$Html$Events$alwaysStop = function (x) {
+	return _Utils_Tuple2(x, true);
+};
+var elm$virtual_dom$VirtualDom$MayStopPropagation = function (a) {
+	return {$: 'MayStopPropagation', a: a};
+};
+var elm$html$Html$Events$stopPropagationOn = F2(
+	function (event, decoder) {
+		return A2(
+			elm$virtual_dom$VirtualDom$on,
+			event,
+			elm$virtual_dom$VirtualDom$MayStopPropagation(decoder));
+	});
+var elm$json$Json$Decode$at = F2(
+	function (fields, decoder) {
+		return A3(elm$core$List$foldr, elm$json$Json$Decode$field, decoder, fields);
+	});
+var elm$html$Html$Events$targetValue = A2(
+	elm$json$Json$Decode$at,
+	_List_fromArray(
+		['target', 'value']),
+	elm$json$Json$Decode$string);
+var elm$html$Html$Events$onInput = function (tagger) {
+	return A2(
+		elm$html$Html$Events$stopPropagationOn,
+		'input',
+		A2(
+			elm$json$Json$Decode$map,
+			elm$html$Html$Events$alwaysStop,
+			A2(elm$json$Json$Decode$map, tagger, elm$html$Html$Events$targetValue)));
+};
+var mdgriffith$elm_ui$Internal$Model$Nearby = F2(
+	function (a, b) {
+		return {$: 'Nearby', a: a, b: b};
+	});
+var mdgriffith$elm_ui$Element$createNearby = F2(
+	function (loc, element) {
+		if (element.$ === 'Empty') {
+			return mdgriffith$elm_ui$Internal$Model$NoAttribute;
+		} else {
+			return A2(mdgriffith$elm_ui$Internal$Model$Nearby, loc, element);
+		}
+	});
+var mdgriffith$elm_ui$Internal$Model$Behind = {$: 'Behind'};
+var mdgriffith$elm_ui$Element$behindContent = function (element) {
+	return A2(mdgriffith$elm_ui$Element$createNearby, mdgriffith$elm_ui$Internal$Model$Behind, element);
+};
+var mdgriffith$elm_ui$Internal$Model$Empty = {$: 'Empty'};
+var mdgriffith$elm_ui$Element$none = mdgriffith$elm_ui$Internal$Model$Empty;
+var mdgriffith$elm_ui$Element$spacingXY = F2(
+	function (x, y) {
+		return A2(
+			mdgriffith$elm_ui$Internal$Model$StyleClass,
+			mdgriffith$elm_ui$Internal$Flag$spacing,
+			A3(
+				mdgriffith$elm_ui$Internal$Model$SpacingStyle,
+				A2(mdgriffith$elm_ui$Internal$Model$spacingName, x, y),
+				x,
+				y));
+	});
+var mdgriffith$elm_ui$Element$Input$applyLabel = F3(
+	function (attrs, label, input) {
+		if (label.$ === 'HiddenLabel') {
+			var labelText = label.a;
+			return A4(
+				mdgriffith$elm_ui$Internal$Model$element,
+				mdgriffith$elm_ui$Internal$Model$asColumn,
+				mdgriffith$elm_ui$Internal$Model$NodeName('label'),
+				attrs,
+				mdgriffith$elm_ui$Internal$Model$Unkeyed(
+					_List_fromArray(
+						[input])));
+		} else {
+			var position = label.a;
+			var labelAttrs = label.b;
+			var labelChild = label.c;
+			var labelElement = A4(
+				mdgriffith$elm_ui$Internal$Model$element,
+				mdgriffith$elm_ui$Internal$Model$asEl,
+				mdgriffith$elm_ui$Internal$Model$div,
+				labelAttrs,
+				mdgriffith$elm_ui$Internal$Model$Unkeyed(
+					_List_fromArray(
+						[labelChild])));
+			switch (position.$) {
+				case 'Above':
+					return A4(
+						mdgriffith$elm_ui$Internal$Model$element,
+						mdgriffith$elm_ui$Internal$Model$asColumn,
+						mdgriffith$elm_ui$Internal$Model$NodeName('label'),
+						attrs,
+						mdgriffith$elm_ui$Internal$Model$Unkeyed(
+							_List_fromArray(
+								[labelElement, input])));
+				case 'Below':
+					return A4(
+						mdgriffith$elm_ui$Internal$Model$element,
+						mdgriffith$elm_ui$Internal$Model$asColumn,
+						mdgriffith$elm_ui$Internal$Model$NodeName('label'),
+						attrs,
+						mdgriffith$elm_ui$Internal$Model$Unkeyed(
+							_List_fromArray(
+								[input, labelElement])));
+				case 'OnRight':
+					return A4(
+						mdgriffith$elm_ui$Internal$Model$element,
+						mdgriffith$elm_ui$Internal$Model$asRow,
+						mdgriffith$elm_ui$Internal$Model$NodeName('label'),
+						attrs,
+						mdgriffith$elm_ui$Internal$Model$Unkeyed(
+							_List_fromArray(
+								[input, labelElement])));
+				default:
+					return A4(
+						mdgriffith$elm_ui$Internal$Model$element,
+						mdgriffith$elm_ui$Internal$Model$asRow,
+						mdgriffith$elm_ui$Internal$Model$NodeName('label'),
+						attrs,
+						mdgriffith$elm_ui$Internal$Model$Unkeyed(
+							_List_fromArray(
+								[labelElement, input])));
+			}
+		}
+	});
+var mdgriffith$elm_ui$Internal$Model$Label = function (a) {
+	return {$: 'Label', a: a};
+};
+var mdgriffith$elm_ui$Element$Input$hiddenLabelAttribute = function (label) {
+	if (label.$ === 'HiddenLabel') {
+		var textLabel = label.a;
+		return mdgriffith$elm_ui$Internal$Model$Describe(
+			mdgriffith$elm_ui$Internal$Model$Label(textLabel));
+	} else {
+		return mdgriffith$elm_ui$Internal$Model$NoAttribute;
+	}
+};
+var mdgriffith$elm_ui$Element$Input$isHiddenLabel = function (label) {
+	if (label.$ === 'HiddenLabel') {
+		return true;
+	} else {
+		return false;
+	}
+};
+var elm$core$Basics$never = function (_n0) {
+	never:
+	while (true) {
+		var nvr = _n0.a;
+		var $temp$_n0 = nvr;
+		_n0 = $temp$_n0;
+		continue never;
+	}
+};
+var elm$virtual_dom$VirtualDom$mapAttribute = _VirtualDom_mapAttribute;
+var mdgriffith$elm_ui$Internal$Model$TransformComponent = F2(
+	function (a, b) {
+		return {$: 'TransformComponent', a: a, b: b};
+	});
+var elm$virtual_dom$VirtualDom$map = _VirtualDom_map;
+var mdgriffith$elm_ui$Internal$Model$map = F2(
+	function (fn, el) {
+		switch (el.$) {
+			case 'Styled':
+				var styled = el.a;
+				return mdgriffith$elm_ui$Internal$Model$Styled(
+					{
+						html: F2(
+							function (add, context) {
+								return A2(
+									elm$virtual_dom$VirtualDom$map,
+									fn,
+									A2(styled.html, add, context));
+							}),
+						styles: styled.styles
+					});
+			case 'Unstyled':
+				var html = el.a;
+				return mdgriffith$elm_ui$Internal$Model$Unstyled(
+					A2(
+						elm$core$Basics$composeL,
+						elm$virtual_dom$VirtualDom$map(fn),
+						html));
+			case 'Text':
+				var str = el.a;
+				return mdgriffith$elm_ui$Internal$Model$Text(str);
+			default:
+				return mdgriffith$elm_ui$Internal$Model$Empty;
+		}
+	});
+var mdgriffith$elm_ui$Internal$Model$mapAttr = F2(
+	function (fn, attr) {
+		switch (attr.$) {
+			case 'NoAttribute':
+				return mdgriffith$elm_ui$Internal$Model$NoAttribute;
+			case 'Describe':
+				var description = attr.a;
+				return mdgriffith$elm_ui$Internal$Model$Describe(description);
+			case 'AlignX':
+				var x = attr.a;
+				return mdgriffith$elm_ui$Internal$Model$AlignX(x);
+			case 'AlignY':
+				var y = attr.a;
+				return mdgriffith$elm_ui$Internal$Model$AlignY(y);
+			case 'Width':
+				var x = attr.a;
+				return mdgriffith$elm_ui$Internal$Model$Width(x);
+			case 'Height':
+				var x = attr.a;
+				return mdgriffith$elm_ui$Internal$Model$Height(x);
+			case 'Class':
+				var x = attr.a;
+				var y = attr.b;
+				return A2(mdgriffith$elm_ui$Internal$Model$Class, x, y);
+			case 'StyleClass':
+				var flag = attr.a;
+				var style = attr.b;
+				return A2(mdgriffith$elm_ui$Internal$Model$StyleClass, flag, style);
+			case 'Nearby':
+				var location = attr.a;
+				var elem = attr.b;
+				return A2(
+					mdgriffith$elm_ui$Internal$Model$Nearby,
+					location,
+					A2(mdgriffith$elm_ui$Internal$Model$map, fn, elem));
+			case 'Attr':
+				var htmlAttr = attr.a;
+				return mdgriffith$elm_ui$Internal$Model$Attr(
+					A2(elm$virtual_dom$VirtualDom$mapAttribute, fn, htmlAttr));
+			default:
+				var fl = attr.a;
+				var trans = attr.b;
+				return A2(mdgriffith$elm_ui$Internal$Model$TransformComponent, fl, trans);
+		}
+	});
+var mdgriffith$elm_ui$Element$Input$viewHorizontalThumb = F3(
+	function (factor, thumbAttributes, trackHeight) {
+		return A2(
+			mdgriffith$elm_ui$Element$row,
+			_List_fromArray(
+				[
+					mdgriffith$elm_ui$Element$width(mdgriffith$elm_ui$Element$fill),
+					mdgriffith$elm_ui$Element$height(
+					A2(elm$core$Maybe$withDefault, mdgriffith$elm_ui$Element$fill, trackHeight)),
+					mdgriffith$elm_ui$Element$centerY
+				]),
+			_List_fromArray(
+				[
+					A2(
+					mdgriffith$elm_ui$Element$el,
+					_List_fromArray(
+						[
+							mdgriffith$elm_ui$Element$width(
+							mdgriffith$elm_ui$Element$fillPortion(
+								elm$core$Basics$round(factor * 10000)))
+						]),
+					mdgriffith$elm_ui$Element$none),
+					A2(
+					mdgriffith$elm_ui$Element$el,
+					A2(
+						elm$core$List$cons,
+						mdgriffith$elm_ui$Element$centerY,
+						A2(
+							elm$core$List$map,
+							mdgriffith$elm_ui$Internal$Model$mapAttr(elm$core$Basics$never),
+							thumbAttributes)),
+					mdgriffith$elm_ui$Element$none),
+					A2(
+					mdgriffith$elm_ui$Element$el,
+					_List_fromArray(
+						[
+							mdgriffith$elm_ui$Element$width(
+							mdgriffith$elm_ui$Element$fillPortion(
+								elm$core$Basics$round(
+									elm$core$Basics$abs(1 - factor) * 10000)))
+						]),
+					mdgriffith$elm_ui$Element$none)
+				]));
+	});
+var mdgriffith$elm_ui$Element$Input$viewVerticalThumb = F3(
+	function (factor, thumbAttributes, trackWidth) {
+		return A2(
+			mdgriffith$elm_ui$Element$column,
+			_List_fromArray(
+				[
+					mdgriffith$elm_ui$Element$height(mdgriffith$elm_ui$Element$fill),
+					mdgriffith$elm_ui$Element$width(
+					A2(elm$core$Maybe$withDefault, mdgriffith$elm_ui$Element$fill, trackWidth)),
+					mdgriffith$elm_ui$Element$centerX
+				]),
+			_List_fromArray(
+				[
+					A2(
+					mdgriffith$elm_ui$Element$el,
+					_List_fromArray(
+						[
+							mdgriffith$elm_ui$Element$height(
+							mdgriffith$elm_ui$Element$fillPortion(
+								elm$core$Basics$round(
+									elm$core$Basics$abs(1 - factor) * 10000)))
+						]),
+					mdgriffith$elm_ui$Element$none),
+					A2(
+					mdgriffith$elm_ui$Element$el,
+					A2(
+						elm$core$List$cons,
+						mdgriffith$elm_ui$Element$centerX,
+						A2(
+							elm$core$List$map,
+							mdgriffith$elm_ui$Internal$Model$mapAttr(elm$core$Basics$never),
+							thumbAttributes)),
+					mdgriffith$elm_ui$Element$none),
+					A2(
+					mdgriffith$elm_ui$Element$el,
+					_List_fromArray(
+						[
+							mdgriffith$elm_ui$Element$height(
+							mdgriffith$elm_ui$Element$fillPortion(
+								elm$core$Basics$round(factor * 10000)))
+						]),
+					mdgriffith$elm_ui$Element$none)
+				]));
+	});
+var mdgriffith$elm_ui$Internal$Model$LivePolite = {$: 'LivePolite'};
+var mdgriffith$elm_ui$Element$Region$announce = mdgriffith$elm_ui$Internal$Model$Describe(mdgriffith$elm_ui$Internal$Model$LivePolite);
+var mdgriffith$elm_ui$Internal$Flag$active = mdgriffith$elm_ui$Internal$Flag$flag(32);
+var mdgriffith$elm_ui$Internal$Flag$focus = mdgriffith$elm_ui$Internal$Flag$flag(31);
+var mdgriffith$elm_ui$Internal$Flag$hover = mdgriffith$elm_ui$Internal$Flag$flag(33);
+var mdgriffith$elm_ui$Internal$Model$getHeight = function (attrs) {
+	return A3(
+		elm$core$List$foldr,
+		F2(
+			function (attr, acc) {
+				if (acc.$ === 'Just') {
+					var x = acc.a;
+					return elm$core$Maybe$Just(x);
+				} else {
+					if (attr.$ === 'Height') {
+						var len = attr.a;
+						return elm$core$Maybe$Just(len);
+					} else {
+						return elm$core$Maybe$Nothing;
+					}
+				}
+			}),
+		elm$core$Maybe$Nothing,
+		attrs);
+};
+var mdgriffith$elm_ui$Internal$Model$getSpacing = F2(
+	function (attrs, _default) {
+		return A2(
+			elm$core$Maybe$withDefault,
+			_default,
+			A3(
+				elm$core$List$foldr,
+				F2(
+					function (attr, acc) {
+						if (acc.$ === 'Just') {
+							var x = acc.a;
+							return elm$core$Maybe$Just(x);
+						} else {
+							if ((attr.$ === 'StyleClass') && (attr.b.$ === 'SpacingStyle')) {
+								var _n2 = attr.b;
+								var x = _n2.b;
+								var y = _n2.c;
+								return elm$core$Maybe$Just(
+									_Utils_Tuple2(x, y));
+							} else {
+								return elm$core$Maybe$Nothing;
+							}
+						}
+					}),
+				elm$core$Maybe$Nothing,
+				attrs));
+	});
+var mdgriffith$elm_ui$Internal$Model$getWidth = function (attrs) {
+	return A3(
+		elm$core$List$foldr,
+		F2(
+			function (attr, acc) {
+				if (acc.$ === 'Just') {
+					var x = acc.a;
+					return elm$core$Maybe$Just(x);
+				} else {
+					if (attr.$ === 'Width') {
+						var len = attr.a;
+						return elm$core$Maybe$Just(len);
+					} else {
+						return elm$core$Maybe$Nothing;
+					}
+				}
+			}),
+		elm$core$Maybe$Nothing,
+		attrs);
+};
+var mdgriffith$elm_ui$Element$Input$slider = F2(
+	function (attributes, input) {
+		var trackWidth = mdgriffith$elm_ui$Internal$Model$getWidth(attributes);
+		var trackHeight = mdgriffith$elm_ui$Internal$Model$getHeight(attributes);
+		var vertical = function () {
+			var _n8 = _Utils_Tuple2(trackWidth, trackHeight);
+			_n8$3:
+			while (true) {
+				if (_n8.a.$ === 'Nothing') {
+					if (_n8.b.$ === 'Nothing') {
+						var _n9 = _n8.a;
+						var _n10 = _n8.b;
+						return false;
+					} else {
+						break _n8$3;
+					}
+				} else {
+					if ((_n8.a.a.$ === 'Px') && (_n8.b.$ === 'Just')) {
+						switch (_n8.b.a.$) {
+							case 'Px':
+								var w = _n8.a.a.a;
+								var h = _n8.b.a.a;
+								return _Utils_cmp(h, w) > 0;
+							case 'Fill':
+								return true;
+							default:
+								break _n8$3;
+						}
+					} else {
+						break _n8$3;
+					}
+				}
+			}
+			return false;
+		}();
+		var factor = (input.value - input.min) / (input.max - input.min);
+		var _n0 = input.thumb;
+		var thumbAttributes = _n0.a;
+		var height = mdgriffith$elm_ui$Internal$Model$getHeight(thumbAttributes);
+		var thumbHeightString = function () {
+			if (height.$ === 'Nothing') {
+				return '20px';
+			} else {
+				if (height.a.$ === 'Px') {
+					var px = height.a.a;
+					return elm$core$String$fromInt(px) + 'px';
+				} else {
+					return '100%';
+				}
+			}
+		}();
+		var width = mdgriffith$elm_ui$Internal$Model$getWidth(thumbAttributes);
+		var thumbWidthString = function () {
+			if (width.$ === 'Nothing') {
+				return '20px';
+			} else {
+				if (width.a.$ === 'Px') {
+					var px = width.a.a;
+					return elm$core$String$fromInt(px) + 'px';
+				} else {
+					return '100%';
+				}
+			}
+		}();
+		var className = 'thmb-' + (thumbWidthString + ('-' + thumbHeightString));
+		var thumbShadowStyle = _List_fromArray(
+			[
+				A2(mdgriffith$elm_ui$Internal$Model$Property, 'width', thumbWidthString),
+				A2(mdgriffith$elm_ui$Internal$Model$Property, 'height', thumbHeightString)
+			]);
+		var _n1 = A2(
+			mdgriffith$elm_ui$Internal$Model$getSpacing,
+			attributes,
+			_Utils_Tuple2(5, 5));
+		var spacingX = _n1.a;
+		var spacingY = _n1.b;
+		return A3(
+			mdgriffith$elm_ui$Element$Input$applyLabel,
+			_List_fromArray(
+				[
+					mdgriffith$elm_ui$Element$Input$isHiddenLabel(input.label) ? mdgriffith$elm_ui$Internal$Model$NoAttribute : A2(mdgriffith$elm_ui$Element$spacingXY, spacingX, spacingY),
+					mdgriffith$elm_ui$Element$Region$announce,
+					mdgriffith$elm_ui$Element$width(
+					function () {
+						if (trackWidth.$ === 'Nothing') {
+							return mdgriffith$elm_ui$Element$fill;
+						} else {
+							if (trackWidth.a.$ === 'Px') {
+								return mdgriffith$elm_ui$Element$shrink;
+							} else {
+								var x = trackWidth.a;
+								return x;
+							}
+						}
+					}()),
+					mdgriffith$elm_ui$Element$height(
+					function () {
+						if (trackHeight.$ === 'Nothing') {
+							return mdgriffith$elm_ui$Element$shrink;
+						} else {
+							if (trackHeight.a.$ === 'Px') {
+								return mdgriffith$elm_ui$Element$shrink;
+							} else {
+								var x = trackHeight.a;
+								return x;
+							}
+						}
+					}())
+				]),
+			input.label,
+			A2(
+				mdgriffith$elm_ui$Element$row,
+				_List_fromArray(
+					[
+						mdgriffith$elm_ui$Element$width(
+						A2(elm$core$Maybe$withDefault, mdgriffith$elm_ui$Element$fill, trackWidth)),
+						mdgriffith$elm_ui$Element$height(
+						A2(
+							elm$core$Maybe$withDefault,
+							mdgriffith$elm_ui$Element$px(20),
+							trackHeight))
+					]),
+				_List_fromArray(
+					[
+						A4(
+						mdgriffith$elm_ui$Internal$Model$element,
+						mdgriffith$elm_ui$Internal$Model$asEl,
+						mdgriffith$elm_ui$Internal$Model$NodeName('input'),
+						_List_fromArray(
+							[
+								mdgriffith$elm_ui$Element$Input$hiddenLabelAttribute(input.label),
+								A2(
+								mdgriffith$elm_ui$Internal$Model$StyleClass,
+								mdgriffith$elm_ui$Internal$Flag$active,
+								A2(mdgriffith$elm_ui$Internal$Model$Style, 'input[type=\"range\"].' + (className + '::-moz-range-thumb'), thumbShadowStyle)),
+								A2(
+								mdgriffith$elm_ui$Internal$Model$StyleClass,
+								mdgriffith$elm_ui$Internal$Flag$hover,
+								A2(mdgriffith$elm_ui$Internal$Model$Style, 'input[type=\"range\"].' + (className + '::-webkit-slider-thumb'), thumbShadowStyle)),
+								A2(
+								mdgriffith$elm_ui$Internal$Model$StyleClass,
+								mdgriffith$elm_ui$Internal$Flag$focus,
+								A2(mdgriffith$elm_ui$Internal$Model$Style, 'input[type=\"range\"].' + (className + '::-ms-thumb'), thumbShadowStyle)),
+								mdgriffith$elm_ui$Internal$Model$Attr(
+								elm$html$Html$Attributes$class(className + ' focusable-parent')),
+								mdgriffith$elm_ui$Internal$Model$Attr(
+								elm$html$Html$Events$onInput(
+									function (str) {
+										var _n4 = elm$core$String$toFloat(str);
+										if (_n4.$ === 'Nothing') {
+											return input.onChange(0);
+										} else {
+											var val = _n4.a;
+											return input.onChange(val);
+										}
+									})),
+								mdgriffith$elm_ui$Internal$Model$Attr(
+								elm$html$Html$Attributes$type_('range')),
+								mdgriffith$elm_ui$Internal$Model$Attr(
+								elm$html$Html$Attributes$step(
+									function () {
+										var _n5 = input.step;
+										if (_n5.$ === 'Nothing') {
+											return 'any';
+										} else {
+											var step = _n5.a;
+											return elm$core$String$fromFloat(step);
+										}
+									}())),
+								mdgriffith$elm_ui$Internal$Model$Attr(
+								elm$html$Html$Attributes$min(
+									elm$core$String$fromFloat(input.min))),
+								mdgriffith$elm_ui$Internal$Model$Attr(
+								elm$html$Html$Attributes$max(
+									elm$core$String$fromFloat(input.max))),
+								mdgriffith$elm_ui$Internal$Model$Attr(
+								elm$html$Html$Attributes$value(
+									elm$core$String$fromFloat(input.value))),
+								vertical ? mdgriffith$elm_ui$Internal$Model$Attr(
+								A2(elm$html$Html$Attributes$attribute, 'orient', 'vertical')) : mdgriffith$elm_ui$Internal$Model$NoAttribute,
+								mdgriffith$elm_ui$Element$width(
+								vertical ? A2(
+									elm$core$Maybe$withDefault,
+									mdgriffith$elm_ui$Element$px(20),
+									trackHeight) : A2(elm$core$Maybe$withDefault, mdgriffith$elm_ui$Element$fill, trackWidth)),
+								mdgriffith$elm_ui$Element$height(
+								vertical ? A2(elm$core$Maybe$withDefault, mdgriffith$elm_ui$Element$fill, trackWidth) : A2(
+									elm$core$Maybe$withDefault,
+									mdgriffith$elm_ui$Element$px(20),
+									trackHeight))
+							]),
+						mdgriffith$elm_ui$Internal$Model$Unkeyed(_List_Nil)),
+						A2(
+						mdgriffith$elm_ui$Element$el,
+						A2(
+							elm$core$List$cons,
+							mdgriffith$elm_ui$Element$width(
+								A2(elm$core$Maybe$withDefault, mdgriffith$elm_ui$Element$fill, trackWidth)),
+							A2(
+								elm$core$List$cons,
+								mdgriffith$elm_ui$Element$height(
+									A2(
+										elm$core$Maybe$withDefault,
+										mdgriffith$elm_ui$Element$px(20),
+										trackHeight)),
+								_Utils_ap(
+									attributes,
+									_List_fromArray(
+										[
+											mdgriffith$elm_ui$Element$behindContent(
+											vertical ? A3(mdgriffith$elm_ui$Element$Input$viewVerticalThumb, factor, thumbAttributes, trackWidth) : A3(mdgriffith$elm_ui$Element$Input$viewHorizontalThumb, factor, thumbAttributes, trackHeight))
+										])))),
+						mdgriffith$elm_ui$Element$none)
+					])));
+	});
 var author$project$MapExample$view = function (model) {
 	return {
 		body: elm$core$List$singleton(
@@ -11972,7 +12515,7 @@ var author$project$MapExample$view = function (model) {
 											_List_fromArray(
 												[
 													A2(
-													mdgriffith$elm_ui$Element$Input$button,
+													mdgriffith$elm_ui$Element$Input$slider,
 													_List_fromArray(
 														[
 															mdgriffith$elm_ui$Element$Background$color(author$project$MapExample$lightgrey),
@@ -11980,26 +12523,16 @@ var author$project$MapExample$view = function (model) {
 														]),
 													{
 														label: A2(
-															mdgriffith$elm_ui$Element$el,
-															_List_fromArray(
-																[mdgriffith$elm_ui$Element$centerX, mdgriffith$elm_ui$Element$centerY]),
-															mdgriffith$elm_ui$Element$text('Zoom In')),
-														onPress: elm$core$Maybe$Just(author$project$MapExample$ZoomIn)
-													}),
-													A2(
-													mdgriffith$elm_ui$Element$Input$button,
-													_List_fromArray(
-														[
-															mdgriffith$elm_ui$Element$Background$color(author$project$MapExample$lightgrey),
-															mdgriffith$elm_ui$Element$padding(10)
-														]),
-													{
-														label: A2(
-															mdgriffith$elm_ui$Element$el,
-															_List_fromArray(
-																[mdgriffith$elm_ui$Element$centerX, mdgriffith$elm_ui$Element$centerY]),
-															mdgriffith$elm_ui$Element$text('Zoom Out')),
-														onPress: elm$core$Maybe$Just(author$project$MapExample$ZoomOut)
+															mdgriffith$elm_ui$Element$Input$labelAbove,
+															_List_Nil,
+															mdgriffith$elm_ui$Element$text(
+																'Zoom (' + (elm$core$String$fromFloat(model.zoomChoice) + ')'))),
+														max: 5.0,
+														min: 0.1,
+														onChange: author$project$MapExample$ZoomSliderChange,
+														step: elm$core$Maybe$Just(0.1),
+														thumb: mdgriffith$elm_ui$Element$Input$defaultThumb,
+														value: model.zoomChoice
 													})
 												])),
 											A2(
@@ -12062,15 +12595,6 @@ var elm$browser$Browser$Internal = function (a) {
 };
 var elm$browser$Browser$Dom$NotFound = function (a) {
 	return {$: 'NotFound', a: a};
-};
-var elm$core$Basics$never = function (_n0) {
-	never:
-	while (true) {
-		var nvr = _n0.a;
-		var $temp$_n0 = nvr;
-		_n0 = $temp$_n0;
-		continue never;
-	}
 };
 var elm$core$Task$Perform = function (a) {
 	return {$: 'Perform', a: a};
