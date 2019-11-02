@@ -3882,43 +3882,6 @@ function _VirtualDom_dekey(keyedNode)
 
 
 
-var _Bitwise_and = F2(function(a, b)
-{
-	return a & b;
-});
-
-var _Bitwise_or = F2(function(a, b)
-{
-	return a | b;
-});
-
-var _Bitwise_xor = F2(function(a, b)
-{
-	return a ^ b;
-});
-
-function _Bitwise_complement(a)
-{
-	return ~a;
-};
-
-var _Bitwise_shiftLeftBy = F2(function(offset, a)
-{
-	return a << offset;
-});
-
-var _Bitwise_shiftRightBy = F2(function(offset, a)
-{
-	return a >> offset;
-});
-
-var _Bitwise_shiftRightZfBy = F2(function(offset, a)
-{
-	return a >>> offset;
-});
-
-
-
 
 // ELEMENT
 
@@ -4357,6 +4320,43 @@ function _Browser_load(url)
 		}
 	}));
 }
+
+
+
+var _Bitwise_and = F2(function(a, b)
+{
+	return a & b;
+});
+
+var _Bitwise_or = F2(function(a, b)
+{
+	return a | b;
+});
+
+var _Bitwise_xor = F2(function(a, b)
+{
+	return a ^ b;
+});
+
+function _Bitwise_complement(a)
+{
+	return ~a;
+};
+
+var _Bitwise_shiftLeftBy = F2(function(offset, a)
+{
+	return a << offset;
+});
+
+var _Bitwise_shiftRightBy = F2(function(offset, a)
+{
+	return a >> offset;
+});
+
+var _Bitwise_shiftRightZfBy = F2(function(offset, a)
+{
+	return a >>> offset;
+});
 var author$project$MapExample$Factor = function (a) {
 	return {$: 'Factor', a: a};
 };
@@ -4869,7 +4869,6 @@ var author$project$MapExample$rectangularFlatTopMap = F2(
 var author$project$MapExample$SetHex = function (a) {
 	return {$: 'SetHex', a: a};
 };
-var author$project$MapExample$landgray = '#b7af92';
 var elm$core$Basics$identity = function (x) {
 	return x;
 };
@@ -5231,7 +5230,6 @@ var elm$svg$Svg$polygon = elm$svg$Svg$trustedNode('polygon');
 var elm$svg$Svg$Attributes$fill = _VirtualDom_attribute('fill');
 var elm$svg$Svg$Attributes$points = _VirtualDom_attribute('points');
 var elm$svg$Svg$Attributes$stroke = _VirtualDom_attribute('stroke');
-var elm$svg$Svg$Attributes$strokeOpacity = _VirtualDom_attribute('stroke-opacity');
 var elm$svg$Svg$Attributes$strokeWidth = _VirtualDom_attribute('stroke-width');
 var elm$svg$Svg$Attributes$style = _VirtualDom_attribute('style');
 var elm$virtual_dom$VirtualDom$Normal = function (a) {
@@ -5267,12 +5265,11 @@ var author$project$MapExample$grassView = F2(
 				_List_fromArray(
 					[
 						elm$svg$Svg$Attributes$style('cursor: pointer'),
-						A2(elm$virtual_dom$VirtualDom$attribute, 'vector-effect', 'non-scaling-size'),
+						A2(elm$virtual_dom$VirtualDom$attribute, 'shape-rendering', 'optimizeSpeed'),
 						elm$svg$Svg$Attributes$stroke('#003400'),
-						elm$svg$Svg$Attributes$strokeWidth('2px'),
-						elm$svg$Svg$Attributes$fill(author$project$MapExample$landgray),
+						elm$svg$Svg$Attributes$strokeWidth('5px'),
+						elm$svg$Svg$Attributes$fill('None'),
 						elm$svg$Svg$Attributes$points(cornersCoords),
-						elm$svg$Svg$Attributes$strokeOpacity('0.6'),
 						elm$svg$Svg$Events$onMouseDown(
 						author$project$MapExample$SetHex(hexLocation))
 					]),
@@ -5280,6 +5277,7 @@ var author$project$MapExample$grassView = F2(
 			]);
 	});
 var author$project$MapExample$watergray = '#86a39c';
+var elm$svg$Svg$Attributes$strokeOpacity = _VirtualDom_attribute('stroke-opacity');
 var author$project$MapExample$toPolygon = F2(
 	function (hexLocation, cornersCoords) {
 		return _List_fromArray(
@@ -5289,9 +5287,8 @@ var author$project$MapExample$toPolygon = F2(
 				_List_fromArray(
 					[
 						elm$svg$Svg$Attributes$style('cursor: pointer'),
-						A2(elm$virtual_dom$VirtualDom$attribute, 'vector-effect', 'non-scaling-size'),
 						elm$svg$Svg$Attributes$stroke('#000000'),
-						elm$svg$Svg$Attributes$strokeWidth('2px'),
+						elm$svg$Svg$Attributes$strokeWidth('1px'),
 						elm$svg$Svg$Attributes$fill(author$project$MapExample$watergray),
 						elm$svg$Svg$Attributes$strokeOpacity('0.1'),
 						elm$svg$Svg$Attributes$points(cornersCoords),
@@ -5308,7 +5305,13 @@ var author$project$MapExample$typeView = function (ctype) {
 		return author$project$MapExample$toPolygon;
 	}
 };
+var zaboco$elm_draggable$Draggable$State = function (a) {
+	return {$: 'State', a: a};
+};
+var zaboco$elm_draggable$Internal$NotDragging = {$: 'NotDragging'};
+var zaboco$elm_draggable$Draggable$init = zaboco$elm_draggable$Draggable$State(zaboco$elm_draggable$Internal$NotDragging);
 var author$project$MapExample$emptyModel = {
+	drag: zaboco$elm_draggable$Draggable$init,
 	gridLayout: author$project$MapExample$layout,
 	map: A2(author$project$MapExample$rectangularFlatTopMap, author$project$MapExample$mapHeight, author$project$MapExample$mapWidth),
 	typeMap: {hexType: elm$core$Dict$empty, typeView: author$project$MapExample$typeView, _void: author$project$MapExample$Void},
@@ -5322,10 +5325,568 @@ var elm$core$Platform$Cmd$none = elm$core$Platform$Cmd$batch(_List_Nil);
 var author$project$MapExample$init = function (_n0) {
 	return _Utils_Tuple2(author$project$MapExample$emptyModel, elm$core$Platform$Cmd$none);
 };
+var author$project$MapExample$DragMsg = function (a) {
+	return {$: 'DragMsg', a: a};
+};
+var elm$browser$Browser$Events$Document = {$: 'Document'};
+var elm$browser$Browser$Events$MySub = F3(
+	function (a, b, c) {
+		return {$: 'MySub', a: a, b: b, c: c};
+	});
+var elm$browser$Browser$Events$State = F2(
+	function (subs, pids) {
+		return {pids: pids, subs: subs};
+	});
+var elm$core$Task$succeed = _Scheduler_succeed;
+var elm$browser$Browser$Events$init = elm$core$Task$succeed(
+	A2(elm$browser$Browser$Events$State, _List_Nil, elm$core$Dict$empty));
+var elm$browser$Browser$Events$nodeToKey = function (node) {
+	if (node.$ === 'Document') {
+		return 'd_';
+	} else {
+		return 'w_';
+	}
+};
+var elm$browser$Browser$Events$addKey = function (sub) {
+	var node = sub.a;
+	var name = sub.b;
+	return _Utils_Tuple2(
+		_Utils_ap(
+			elm$browser$Browser$Events$nodeToKey(node),
+			name),
+		sub);
+};
+var elm$browser$Browser$Events$Event = F2(
+	function (key, event) {
+		return {event: event, key: key};
+	});
+var elm$core$Platform$sendToSelf = _Platform_sendToSelf;
+var elm$core$Task$andThen = _Scheduler_andThen;
+var elm$core$Task$map = F2(
+	function (func, taskA) {
+		return A2(
+			elm$core$Task$andThen,
+			function (a) {
+				return elm$core$Task$succeed(
+					func(a));
+			},
+			taskA);
+	});
+var elm$browser$Browser$External = function (a) {
+	return {$: 'External', a: a};
+};
+var elm$browser$Browser$Internal = function (a) {
+	return {$: 'Internal', a: a};
+};
+var elm$browser$Browser$Dom$NotFound = function (a) {
+	return {$: 'NotFound', a: a};
+};
+var elm$core$Basics$never = function (_n0) {
+	never:
+	while (true) {
+		var nvr = _n0.a;
+		var $temp$_n0 = nvr;
+		_n0 = $temp$_n0;
+		continue never;
+	}
+};
+var elm$core$Task$Perform = function (a) {
+	return {$: 'Perform', a: a};
+};
+var elm$core$Task$init = elm$core$Task$succeed(_Utils_Tuple0);
+var elm$core$Task$map2 = F3(
+	function (func, taskA, taskB) {
+		return A2(
+			elm$core$Task$andThen,
+			function (a) {
+				return A2(
+					elm$core$Task$andThen,
+					function (b) {
+						return elm$core$Task$succeed(
+							A2(func, a, b));
+					},
+					taskB);
+			},
+			taskA);
+	});
+var elm$core$Task$sequence = function (tasks) {
+	return A3(
+		elm$core$List$foldr,
+		elm$core$Task$map2(elm$core$List$cons),
+		elm$core$Task$succeed(_List_Nil),
+		tasks);
+};
+var elm$core$Platform$sendToApp = _Platform_sendToApp;
+var elm$core$Task$spawnCmd = F2(
+	function (router, _n0) {
+		var task = _n0.a;
+		return _Scheduler_spawn(
+			A2(
+				elm$core$Task$andThen,
+				elm$core$Platform$sendToApp(router),
+				task));
+	});
+var elm$core$Task$onEffects = F3(
+	function (router, commands, state) {
+		return A2(
+			elm$core$Task$map,
+			function (_n0) {
+				return _Utils_Tuple0;
+			},
+			elm$core$Task$sequence(
+				A2(
+					elm$core$List$map,
+					elm$core$Task$spawnCmd(router),
+					commands)));
+	});
+var elm$core$Task$onSelfMsg = F3(
+	function (_n0, _n1, _n2) {
+		return elm$core$Task$succeed(_Utils_Tuple0);
+	});
+var elm$core$Task$cmdMap = F2(
+	function (tagger, _n0) {
+		var task = _n0.a;
+		return elm$core$Task$Perform(
+			A2(elm$core$Task$map, tagger, task));
+	});
+_Platform_effectManagers['Task'] = _Platform_createManager(elm$core$Task$init, elm$core$Task$onEffects, elm$core$Task$onSelfMsg, elm$core$Task$cmdMap);
+var elm$core$Task$command = _Platform_leaf('Task');
+var elm$core$Task$perform = F2(
+	function (toMessage, task) {
+		return elm$core$Task$command(
+			elm$core$Task$Perform(
+				A2(elm$core$Task$map, toMessage, task)));
+	});
+var elm$core$String$length = _String_length;
+var elm$core$String$slice = _String_slice;
+var elm$core$String$dropLeft = F2(
+	function (n, string) {
+		return (n < 1) ? string : A3(
+			elm$core$String$slice,
+			n,
+			elm$core$String$length(string),
+			string);
+	});
+var elm$core$String$startsWith = _String_startsWith;
+var elm$url$Url$Http = {$: 'Http'};
+var elm$url$Url$Https = {$: 'Https'};
+var elm$core$String$indexes = _String_indexes;
+var elm$core$String$isEmpty = function (string) {
+	return string === '';
+};
+var elm$core$String$left = F2(
+	function (n, string) {
+		return (n < 1) ? '' : A3(elm$core$String$slice, 0, n, string);
+	});
+var elm$core$String$contains = _String_contains;
+var elm$core$String$toInt = _String_toInt;
+var elm$url$Url$Url = F6(
+	function (protocol, host, port_, path, query, fragment) {
+		return {fragment: fragment, host: host, path: path, port_: port_, protocol: protocol, query: query};
+	});
+var elm$url$Url$chompBeforePath = F5(
+	function (protocol, path, params, frag, str) {
+		if (elm$core$String$isEmpty(str) || A2(elm$core$String$contains, '@', str)) {
+			return elm$core$Maybe$Nothing;
+		} else {
+			var _n0 = A2(elm$core$String$indexes, ':', str);
+			if (!_n0.b) {
+				return elm$core$Maybe$Just(
+					A6(elm$url$Url$Url, protocol, str, elm$core$Maybe$Nothing, path, params, frag));
+			} else {
+				if (!_n0.b.b) {
+					var i = _n0.a;
+					var _n1 = elm$core$String$toInt(
+						A2(elm$core$String$dropLeft, i + 1, str));
+					if (_n1.$ === 'Nothing') {
+						return elm$core$Maybe$Nothing;
+					} else {
+						var port_ = _n1;
+						return elm$core$Maybe$Just(
+							A6(
+								elm$url$Url$Url,
+								protocol,
+								A2(elm$core$String$left, i, str),
+								port_,
+								path,
+								params,
+								frag));
+					}
+				} else {
+					return elm$core$Maybe$Nothing;
+				}
+			}
+		}
+	});
+var elm$url$Url$chompBeforeQuery = F4(
+	function (protocol, params, frag, str) {
+		if (elm$core$String$isEmpty(str)) {
+			return elm$core$Maybe$Nothing;
+		} else {
+			var _n0 = A2(elm$core$String$indexes, '/', str);
+			if (!_n0.b) {
+				return A5(elm$url$Url$chompBeforePath, protocol, '/', params, frag, str);
+			} else {
+				var i = _n0.a;
+				return A5(
+					elm$url$Url$chompBeforePath,
+					protocol,
+					A2(elm$core$String$dropLeft, i, str),
+					params,
+					frag,
+					A2(elm$core$String$left, i, str));
+			}
+		}
+	});
+var elm$url$Url$chompBeforeFragment = F3(
+	function (protocol, frag, str) {
+		if (elm$core$String$isEmpty(str)) {
+			return elm$core$Maybe$Nothing;
+		} else {
+			var _n0 = A2(elm$core$String$indexes, '?', str);
+			if (!_n0.b) {
+				return A4(elm$url$Url$chompBeforeQuery, protocol, elm$core$Maybe$Nothing, frag, str);
+			} else {
+				var i = _n0.a;
+				return A4(
+					elm$url$Url$chompBeforeQuery,
+					protocol,
+					elm$core$Maybe$Just(
+						A2(elm$core$String$dropLeft, i + 1, str)),
+					frag,
+					A2(elm$core$String$left, i, str));
+			}
+		}
+	});
+var elm$url$Url$chompAfterProtocol = F2(
+	function (protocol, str) {
+		if (elm$core$String$isEmpty(str)) {
+			return elm$core$Maybe$Nothing;
+		} else {
+			var _n0 = A2(elm$core$String$indexes, '#', str);
+			if (!_n0.b) {
+				return A3(elm$url$Url$chompBeforeFragment, protocol, elm$core$Maybe$Nothing, str);
+			} else {
+				var i = _n0.a;
+				return A3(
+					elm$url$Url$chompBeforeFragment,
+					protocol,
+					elm$core$Maybe$Just(
+						A2(elm$core$String$dropLeft, i + 1, str)),
+					A2(elm$core$String$left, i, str));
+			}
+		}
+	});
+var elm$url$Url$fromString = function (str) {
+	return A2(elm$core$String$startsWith, 'http://', str) ? A2(
+		elm$url$Url$chompAfterProtocol,
+		elm$url$Url$Http,
+		A2(elm$core$String$dropLeft, 7, str)) : (A2(elm$core$String$startsWith, 'https://', str) ? A2(
+		elm$url$Url$chompAfterProtocol,
+		elm$url$Url$Https,
+		A2(elm$core$String$dropLeft, 8, str)) : elm$core$Maybe$Nothing);
+};
+var elm$browser$Browser$Events$spawn = F3(
+	function (router, key, _n0) {
+		var node = _n0.a;
+		var name = _n0.b;
+		var actualNode = function () {
+			if (node.$ === 'Document') {
+				return _Browser_doc;
+			} else {
+				return _Browser_window;
+			}
+		}();
+		return A2(
+			elm$core$Task$map,
+			function (value) {
+				return _Utils_Tuple2(key, value);
+			},
+			A3(
+				_Browser_on,
+				actualNode,
+				name,
+				function (event) {
+					return A2(
+						elm$core$Platform$sendToSelf,
+						router,
+						A2(elm$browser$Browser$Events$Event, key, event));
+				}));
+	});
+var elm$core$Dict$foldl = F3(
+	function (func, acc, dict) {
+		foldl:
+		while (true) {
+			if (dict.$ === 'RBEmpty_elm_builtin') {
+				return acc;
+			} else {
+				var key = dict.b;
+				var value = dict.c;
+				var left = dict.d;
+				var right = dict.e;
+				var $temp$func = func,
+					$temp$acc = A3(
+					func,
+					key,
+					value,
+					A3(elm$core$Dict$foldl, func, acc, left)),
+					$temp$dict = right;
+				func = $temp$func;
+				acc = $temp$acc;
+				dict = $temp$dict;
+				continue foldl;
+			}
+		}
+	});
+var elm$core$Dict$merge = F6(
+	function (leftStep, bothStep, rightStep, leftDict, rightDict, initialResult) {
+		var stepState = F3(
+			function (rKey, rValue, _n0) {
+				stepState:
+				while (true) {
+					var list = _n0.a;
+					var result = _n0.b;
+					if (!list.b) {
+						return _Utils_Tuple2(
+							list,
+							A3(rightStep, rKey, rValue, result));
+					} else {
+						var _n2 = list.a;
+						var lKey = _n2.a;
+						var lValue = _n2.b;
+						var rest = list.b;
+						if (_Utils_cmp(lKey, rKey) < 0) {
+							var $temp$rKey = rKey,
+								$temp$rValue = rValue,
+								$temp$_n0 = _Utils_Tuple2(
+								rest,
+								A3(leftStep, lKey, lValue, result));
+							rKey = $temp$rKey;
+							rValue = $temp$rValue;
+							_n0 = $temp$_n0;
+							continue stepState;
+						} else {
+							if (_Utils_cmp(lKey, rKey) > 0) {
+								return _Utils_Tuple2(
+									list,
+									A3(rightStep, rKey, rValue, result));
+							} else {
+								return _Utils_Tuple2(
+									rest,
+									A4(bothStep, lKey, lValue, rValue, result));
+							}
+						}
+					}
+				}
+			});
+		var _n3 = A3(
+			elm$core$Dict$foldl,
+			stepState,
+			_Utils_Tuple2(
+				elm$core$Dict$toList(leftDict),
+				initialResult),
+			rightDict);
+		var leftovers = _n3.a;
+		var intermediateResult = _n3.b;
+		return A3(
+			elm$core$List$foldl,
+			F2(
+				function (_n4, result) {
+					var k = _n4.a;
+					var v = _n4.b;
+					return A3(leftStep, k, v, result);
+				}),
+			intermediateResult,
+			leftovers);
+	});
+var elm$core$Dict$union = F2(
+	function (t1, t2) {
+		return A3(elm$core$Dict$foldl, elm$core$Dict$insert, t2, t1);
+	});
+var elm$core$Process$kill = _Scheduler_kill;
+var elm$browser$Browser$Events$onEffects = F3(
+	function (router, subs, state) {
+		var stepRight = F3(
+			function (key, sub, _n6) {
+				var deads = _n6.a;
+				var lives = _n6.b;
+				var news = _n6.c;
+				return _Utils_Tuple3(
+					deads,
+					lives,
+					A2(
+						elm$core$List$cons,
+						A3(elm$browser$Browser$Events$spawn, router, key, sub),
+						news));
+			});
+		var stepLeft = F3(
+			function (_n4, pid, _n5) {
+				var deads = _n5.a;
+				var lives = _n5.b;
+				var news = _n5.c;
+				return _Utils_Tuple3(
+					A2(elm$core$List$cons, pid, deads),
+					lives,
+					news);
+			});
+		var stepBoth = F4(
+			function (key, pid, _n2, _n3) {
+				var deads = _n3.a;
+				var lives = _n3.b;
+				var news = _n3.c;
+				return _Utils_Tuple3(
+					deads,
+					A3(elm$core$Dict$insert, key, pid, lives),
+					news);
+			});
+		var newSubs = A2(elm$core$List$map, elm$browser$Browser$Events$addKey, subs);
+		var _n0 = A6(
+			elm$core$Dict$merge,
+			stepLeft,
+			stepBoth,
+			stepRight,
+			state.pids,
+			elm$core$Dict$fromList(newSubs),
+			_Utils_Tuple3(_List_Nil, elm$core$Dict$empty, _List_Nil));
+		var deadPids = _n0.a;
+		var livePids = _n0.b;
+		var makeNewPids = _n0.c;
+		return A2(
+			elm$core$Task$andThen,
+			function (pids) {
+				return elm$core$Task$succeed(
+					A2(
+						elm$browser$Browser$Events$State,
+						newSubs,
+						A2(
+							elm$core$Dict$union,
+							livePids,
+							elm$core$Dict$fromList(pids))));
+			},
+			A2(
+				elm$core$Task$andThen,
+				function (_n1) {
+					return elm$core$Task$sequence(makeNewPids);
+				},
+				elm$core$Task$sequence(
+					A2(elm$core$List$map, elm$core$Process$kill, deadPids))));
+	});
+var elm$core$List$maybeCons = F3(
+	function (f, mx, xs) {
+		var _n0 = f(mx);
+		if (_n0.$ === 'Just') {
+			var x = _n0.a;
+			return A2(elm$core$List$cons, x, xs);
+		} else {
+			return xs;
+		}
+	});
+var elm$core$List$filterMap = F2(
+	function (f, xs) {
+		return A3(
+			elm$core$List$foldr,
+			elm$core$List$maybeCons(f),
+			_List_Nil,
+			xs);
+	});
+var elm$browser$Browser$Events$onSelfMsg = F3(
+	function (router, _n0, state) {
+		var key = _n0.key;
+		var event = _n0.event;
+		var toMessage = function (_n2) {
+			var subKey = _n2.a;
+			var _n3 = _n2.b;
+			var node = _n3.a;
+			var name = _n3.b;
+			var decoder = _n3.c;
+			return _Utils_eq(subKey, key) ? A2(_Browser_decodeEvent, decoder, event) : elm$core$Maybe$Nothing;
+		};
+		var messages = A2(elm$core$List$filterMap, toMessage, state.subs);
+		return A2(
+			elm$core$Task$andThen,
+			function (_n1) {
+				return elm$core$Task$succeed(state);
+			},
+			elm$core$Task$sequence(
+				A2(
+					elm$core$List$map,
+					elm$core$Platform$sendToApp(router),
+					messages)));
+	});
+var elm$browser$Browser$Events$subMap = F2(
+	function (func, _n0) {
+		var node = _n0.a;
+		var name = _n0.b;
+		var decoder = _n0.c;
+		return A3(
+			elm$browser$Browser$Events$MySub,
+			node,
+			name,
+			A2(elm$json$Json$Decode$map, func, decoder));
+	});
+_Platform_effectManagers['Browser.Events'] = _Platform_createManager(elm$browser$Browser$Events$init, elm$browser$Browser$Events$onEffects, elm$browser$Browser$Events$onSelfMsg, 0, elm$browser$Browser$Events$subMap);
+var elm$browser$Browser$Events$subscription = _Platform_leaf('Browser.Events');
+var elm$browser$Browser$Events$on = F3(
+	function (node, name, decoder) {
+		return elm$browser$Browser$Events$subscription(
+			A3(elm$browser$Browser$Events$MySub, node, name, decoder));
+	});
+var elm$browser$Browser$Events$onMouseMove = A2(elm$browser$Browser$Events$on, elm$browser$Browser$Events$Document, 'mousemove');
+var elm$browser$Browser$Events$onMouseUp = A2(elm$browser$Browser$Events$on, elm$browser$Browser$Events$Document, 'mouseup');
+var elm$core$Basics$composeL = F3(
+	function (g, f, x) {
+		return g(
+			f(x));
+	});
 var elm$core$Platform$Sub$batch = _Platform_batch;
+var elm$core$Platform$Sub$map = _Platform_map;
 var elm$core$Platform$Sub$none = elm$core$Platform$Sub$batch(_List_Nil);
+var zaboco$elm_draggable$Draggable$Msg = function (a) {
+	return {$: 'Msg', a: a};
+};
+var elm$core$Basics$truncate = _Basics_truncate;
+var elm$json$Json$Decode$field = _Json_decodeField;
+var elm$json$Json$Decode$float = _Json_decodeFloat;
+var zaboco$elm_draggable$Internal$Position = F2(
+	function (x, y) {
+		return {x: x, y: y};
+	});
+var zaboco$elm_draggable$Draggable$positionDecoder = A3(
+	elm$json$Json$Decode$map2,
+	zaboco$elm_draggable$Internal$Position,
+	A2(
+		elm$json$Json$Decode$map,
+		elm$core$Basics$truncate,
+		A2(elm$json$Json$Decode$field, 'pageX', elm$json$Json$Decode$float)),
+	A2(
+		elm$json$Json$Decode$map,
+		elm$core$Basics$truncate,
+		A2(elm$json$Json$Decode$field, 'pageY', elm$json$Json$Decode$float)));
+var zaboco$elm_draggable$Internal$DragAt = function (a) {
+	return {$: 'DragAt', a: a};
+};
+var zaboco$elm_draggable$Internal$StopDragging = {$: 'StopDragging'};
+var zaboco$elm_draggable$Draggable$subscriptions = F2(
+	function (envelope, _n0) {
+		var drag = _n0.a;
+		if (drag.$ === 'NotDragging') {
+			return elm$core$Platform$Sub$none;
+		} else {
+			return A2(
+				elm$core$Platform$Sub$map,
+				A2(elm$core$Basics$composeL, envelope, zaboco$elm_draggable$Draggable$Msg),
+				elm$core$Platform$Sub$batch(
+					_List_fromArray(
+						[
+							elm$browser$Browser$Events$onMouseMove(
+							A2(elm$json$Json$Decode$map, zaboco$elm_draggable$Internal$DragAt, zaboco$elm_draggable$Draggable$positionDecoder)),
+							elm$browser$Browser$Events$onMouseUp(
+							elm$json$Json$Decode$succeed(zaboco$elm_draggable$Internal$StopDragging))
+						])));
+		}
+	});
 var author$project$MapExample$subscriptions = function (model) {
-	return elm$core$Platform$Sub$none;
+	return A2(zaboco$elm_draggable$Draggable$subscriptions, author$project$MapExample$DragMsg, model.drag);
 };
 var author$project$MapExample$Grass = {$: 'Grass'};
 var author$project$MapExample$addHexType = F3(
@@ -5335,6 +5896,165 @@ var author$project$MapExample$addHexType = F3(
 			{
 				hexType: A3(elm$core$Dict$insert, hexh, ctype, tmap.hexType)
 			});
+	});
+var author$project$MapExample$OnDragBy = function (a) {
+	return {$: 'OnDragBy', a: a};
+};
+var zaboco$elm_draggable$Draggable$Config = function (a) {
+	return {$: 'Config', a: a};
+};
+var zaboco$elm_draggable$Internal$defaultConfig = {
+	onClick: function (_n0) {
+		return elm$core$Maybe$Nothing;
+	},
+	onDragBy: function (_n1) {
+		return elm$core$Maybe$Nothing;
+	},
+	onDragEnd: elm$core$Maybe$Nothing,
+	onDragStart: function (_n2) {
+		return elm$core$Maybe$Nothing;
+	},
+	onMouseDown: function (_n3) {
+		return elm$core$Maybe$Nothing;
+	}
+};
+var zaboco$elm_draggable$Draggable$basicConfig = function (onDragByListener) {
+	var defaultConfig = zaboco$elm_draggable$Internal$defaultConfig;
+	return zaboco$elm_draggable$Draggable$Config(
+		_Utils_update(
+			defaultConfig,
+			{
+				onDragBy: A2(elm$core$Basics$composeL, elm$core$Maybe$Just, onDragByListener)
+			}));
+};
+var author$project$MapExample$dragConfig = zaboco$elm_draggable$Draggable$basicConfig(author$project$MapExample$OnDragBy);
+var author$project$MapExample$maxZoom = 5;
+var author$project$MapExample$minZoom = 0.1;
+var author$project$MapExample$stepZoom = 0.1;
+var elm$core$Basics$clamp = F3(
+	function (low, high, number) {
+		return (_Utils_cmp(number, low) < 0) ? low : ((_Utils_cmp(number, high) > 0) ? high : number);
+	});
+var elm$core$Maybe$map = F2(
+	function (f, maybe) {
+		if (maybe.$ === 'Just') {
+			var value = maybe.a;
+			return elm$core$Maybe$Just(
+				f(value));
+		} else {
+			return elm$core$Maybe$Nothing;
+		}
+	});
+var elm$core$Maybe$withDefault = F2(
+	function (_default, maybe) {
+		if (maybe.$ === 'Just') {
+			var value = maybe.a;
+			return value;
+		} else {
+			return _default;
+		}
+	});
+var zaboco$elm_draggable$Cmd$Extra$message = function (x) {
+	return A2(
+		elm$core$Task$perform,
+		elm$core$Basics$identity,
+		elm$core$Task$succeed(x));
+};
+var zaboco$elm_draggable$Cmd$Extra$optionalMessage = function (msgMaybe) {
+	return A2(
+		elm$core$Maybe$withDefault,
+		elm$core$Platform$Cmd$none,
+		A2(elm$core$Maybe$map, zaboco$elm_draggable$Cmd$Extra$message, msgMaybe));
+};
+var zaboco$elm_draggable$Internal$Dragging = function (a) {
+	return {$: 'Dragging', a: a};
+};
+var zaboco$elm_draggable$Internal$DraggingTentative = F2(
+	function (a, b) {
+		return {$: 'DraggingTentative', a: a, b: b};
+	});
+var zaboco$elm_draggable$Internal$distanceTo = F2(
+	function (end, start) {
+		return _Utils_Tuple2(end.x - start.x, end.y - start.y);
+	});
+var zaboco$elm_draggable$Internal$updateAndEmit = F3(
+	function (config, msg, drag) {
+		var _n0 = _Utils_Tuple2(drag, msg);
+		_n0$5:
+		while (true) {
+			switch (_n0.a.$) {
+				case 'NotDragging':
+					if (_n0.b.$ === 'StartDragging') {
+						var _n1 = _n0.a;
+						var _n2 = _n0.b;
+						var key = _n2.a;
+						var initialPosition = _n2.b;
+						return _Utils_Tuple2(
+							A2(zaboco$elm_draggable$Internal$DraggingTentative, key, initialPosition),
+							config.onMouseDown(key));
+					} else {
+						break _n0$5;
+					}
+				case 'DraggingTentative':
+					switch (_n0.b.$) {
+						case 'DragAt':
+							var _n3 = _n0.a;
+							var key = _n3.a;
+							var oldPosition = _n3.b;
+							return _Utils_Tuple2(
+								zaboco$elm_draggable$Internal$Dragging(oldPosition),
+								config.onDragStart(key));
+						case 'StopDragging':
+							var _n4 = _n0.a;
+							var key = _n4.a;
+							var _n5 = _n0.b;
+							return _Utils_Tuple2(
+								zaboco$elm_draggable$Internal$NotDragging,
+								config.onClick(key));
+						default:
+							break _n0$5;
+					}
+				default:
+					switch (_n0.b.$) {
+						case 'DragAt':
+							var oldPosition = _n0.a.a;
+							var newPosition = _n0.b.a;
+							return _Utils_Tuple2(
+								zaboco$elm_draggable$Internal$Dragging(newPosition),
+								config.onDragBy(
+									A2(zaboco$elm_draggable$Internal$distanceTo, newPosition, oldPosition)));
+						case 'StopDragging':
+							var _n6 = _n0.b;
+							return _Utils_Tuple2(zaboco$elm_draggable$Internal$NotDragging, config.onDragEnd);
+						default:
+							break _n0$5;
+					}
+			}
+		}
+		return _Utils_Tuple2(drag, elm$core$Maybe$Nothing);
+	});
+var zaboco$elm_draggable$Draggable$updateDraggable = F3(
+	function (_n0, _n1, _n2) {
+		var config = _n0.a;
+		var msg = _n1.a;
+		var drag = _n2.a;
+		var _n3 = A3(zaboco$elm_draggable$Internal$updateAndEmit, config, msg, drag);
+		var newDrag = _n3.a;
+		var newMsgMaybe = _n3.b;
+		return _Utils_Tuple2(
+			zaboco$elm_draggable$Draggable$State(newDrag),
+			zaboco$elm_draggable$Cmd$Extra$optionalMessage(newMsgMaybe));
+	});
+var zaboco$elm_draggable$Draggable$update = F3(
+	function (config, msg, model) {
+		var _n0 = A3(zaboco$elm_draggable$Draggable$updateDraggable, config, msg, model.drag);
+		var dragState = _n0.a;
+		var dragCmd = _n0.b;
+		return _Utils_Tuple2(
+			_Utils_update(
+				model,
+				{drag: dragState}),
+			dragCmd);
 	});
 var author$project$MapExample$update = F2(
 	function (msg, model) {
@@ -5376,16 +6096,57 @@ var author$project$MapExample$update = F2(
 					elm$core$Platform$Cmd$none);
 			case 'ZoomSliderChange':
 				var f = msg.a;
+				var fcapped = A3(elm$core$Basics$clamp, author$project$MapExample$minZoom, author$project$MapExample$maxZoom, f);
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
 						{
-							zoom: author$project$MapExample$Factor(f),
-							zoomChoice: f
+							zoom: author$project$MapExample$Factor(fcapped),
+							zoomChoice: fcapped
 						}),
 					elm$core$Platform$Cmd$none);
+			case 'ZoomScroll':
+				var dy = msg.a;
+				var posneg = function () {
+					var _n1 = dy < 0;
+					if (!_n1) {
+						return author$project$MapExample$stepZoom;
+					} else {
+						return -author$project$MapExample$stepZoom;
+					}
+				}();
+				var fcapped = A3(elm$core$Basics$clamp, author$project$MapExample$minZoom, author$project$MapExample$maxZoom, model.zoomChoice + posneg);
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{
+							zoom: author$project$MapExample$Factor(fcapped),
+							zoomChoice: fcapped
+						}),
+					elm$core$Platform$Cmd$none);
+			case 'ResetView':
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{
+							viewBoxX: 0,
+							viewBoxY: 0,
+							zoom: author$project$MapExample$Factor(0.9),
+							zoomChoice: 0.9
+						}),
+					elm$core$Platform$Cmd$none);
+			case 'OnDragBy':
+				var _n2 = msg.a;
+				var dx = _n2.a;
+				var dy = _n2.b;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{viewBoxX: model.viewBoxX - dx, viewBoxY: model.viewBoxY - dy}),
+					elm$core$Platform$Cmd$none);
 			default:
-				return _Utils_Tuple2(model, elm$core$Platform$Cmd$none);
+				var dragMsg = msg.a;
+				return A3(zaboco$elm_draggable$Draggable$update, author$project$MapExample$dragConfig, dragMsg, model);
 		}
 	});
 var author$project$MapExample$PanDown = {$: 'PanDown'};
@@ -5393,6 +6154,9 @@ var author$project$MapExample$PanLeft = {$: 'PanLeft'};
 var author$project$MapExample$PanRight = {$: 'PanRight'};
 var author$project$MapExample$PanUp = {$: 'PanUp'};
 var author$project$MapExample$ResetView = {$: 'ResetView'};
+var author$project$MapExample$ZoomScroll = function (a) {
+	return {$: 'ZoomScroll', a: a};
+};
 var author$project$MapExample$ZoomSliderChange = function (a) {
 	return {$: 'ZoomSliderChange', a: a};
 };
@@ -5406,6 +6170,29 @@ var mdgriffith$elm_ui$Element$rgb255 = F3(
 	});
 var author$project$MapExample$black = A3(mdgriffith$elm_ui$Element$rgb255, 0, 0, 0);
 var author$project$MapExample$darkblue = A3(mdgriffith$elm_ui$Element$rgb255, 29, 53, 87);
+var elm$virtual_dom$VirtualDom$Custom = function (a) {
+	return {$: 'Custom', a: a};
+};
+var elm$html$Html$Events$custom = F2(
+	function (event, decoder) {
+		return A2(
+			elm$virtual_dom$VirtualDom$on,
+			event,
+			elm$virtual_dom$VirtualDom$Custom(decoder));
+	});
+var author$project$MapExample$handleZoom = function (onZoom) {
+	var zoomDecoder = A2(
+		elm$json$Json$Decode$map,
+		onZoom,
+		A2(elm$json$Json$Decode$field, 'deltaY', elm$json$Json$Decode$float));
+	var alwaysPreventDefaultAndStopPropagation = function (msg) {
+		return {message: msg, preventDefault: true, stopPropagation: true};
+	};
+	return A2(
+		elm$html$Html$Events$custom,
+		'wheel',
+		A2(elm$json$Json$Decode$map, alwaysPreventDefaultAndStopPropagation, zoomDecoder));
+};
 var author$project$MapExample$getCell = function (_n0) {
 	var key = _n0.a;
 	var hex = _n0.b;
@@ -5416,11 +6203,6 @@ var author$project$MapExample$getCellKey = function (_n0) {
 	var hex = _n0.b;
 	return key;
 };
-var elm$core$Basics$composeL = F3(
-	function (g, f, x) {
-		return g(
-			f(x));
-	});
 var elm$core$Basics$pow = _Basics_pow;
 var Voronchuk$hexagons$Hexagons$Layout$precision = F2(
 	function (division, number) {
@@ -5653,6 +6435,7 @@ var elm$core$List$singleton = function (value) {
 		[value]);
 };
 var elm$svg$Svg$svg = elm$svg$Svg$trustedNode('svg');
+var elm$svg$Svg$Attributes$baseProfile = _VirtualDom_attribute('baseProfile');
 var elm$svg$Svg$Attributes$height = _VirtualDom_attribute('height');
 var elm$svg$Svg$Attributes$preserveAspectRatio = _VirtualDom_attribute('preserveAspectRatio');
 var elm$svg$Svg$Attributes$version = _VirtualDom_attribute('version');
@@ -5880,15 +6663,6 @@ var elm$core$Set$member = F2(
 		var dict = _n0.a;
 		return A2(elm$core$Dict$member, key, dict);
 	});
-var elm$core$Maybe$withDefault = F2(
-	function (_default, maybe) {
-		if (maybe.$ === 'Just') {
-			var value = maybe.a;
-			return value;
-		} else {
-			return _default;
-		}
-	});
 var mdgriffith$elm_ui$Internal$Model$lengthClassName = function (x) {
 	switch (x.$) {
 		case 'Px':
@@ -6041,34 +6815,6 @@ var mdgriffith$elm_ui$Internal$Model$reduceStyles = F2(
 		return A2(elm$core$Set$member, styleName, cache) ? nevermind : _Utils_Tuple2(
 			A2(elm$core$Set$insert, styleName, cache),
 			A2(elm$core$List$cons, style, existing));
-	});
-var elm$core$List$maybeCons = F3(
-	function (f, mx, xs) {
-		var _n0 = f(mx);
-		if (_n0.$ === 'Just') {
-			var x = _n0.a;
-			return A2(elm$core$List$cons, x, xs);
-		} else {
-			return xs;
-		}
-	});
-var elm$core$List$filterMap = F2(
-	function (f, xs) {
-		return A3(
-			elm$core$List$foldr,
-			elm$core$List$maybeCons(f),
-			_List_Nil,
-			xs);
-	});
-var elm$core$Maybe$map = F2(
-	function (f, maybe) {
-		if (maybe.$ === 'Just') {
-			var value = maybe.a;
-			return elm$core$Maybe$Just(
-				f(value));
-		} else {
-			return elm$core$Maybe$Nothing;
-		}
 	});
 var elm$core$Tuple$mapFirst = F2(
 	function (func, _n0) {
@@ -11606,7 +12352,6 @@ var elm$html$Html$Events$preventDefaultOn = F2(
 	});
 var elm$json$Json$Decode$andThen = _Json_andThen;
 var elm$json$Json$Decode$fail = _Json_fail;
-var elm$json$Json$Decode$field = _Json_decodeField;
 var elm$json$Json$Decode$string = _Json_decodeString;
 var mdgriffith$elm_ui$Element$Input$onKey = F2(
 	function (desiredCode, msg) {
@@ -11875,15 +12620,6 @@ var mdgriffith$elm_ui$Element$Input$isHiddenLabel = function (label) {
 		return true;
 	} else {
 		return false;
-	}
-};
-var elm$core$Basics$never = function (_n0) {
-	never:
-	while (true) {
-		var nvr = _n0.a;
-		var $temp$_n0 = nvr;
-		_n0 = $temp$_n0;
-		continue never;
 	}
 };
 var elm$virtual_dom$VirtualDom$mapAttribute = _VirtualDom_mapAttribute;
@@ -12342,6 +13078,46 @@ var mdgriffith$elm_ui$Element$Input$slider = F2(
 						mdgriffith$elm_ui$Element$none)
 					])));
 	});
+var zaboco$elm_draggable$Draggable$alwaysPreventDefaultAndStopPropagation = function (msg) {
+	return {message: msg, preventDefault: true, stopPropagation: true};
+};
+var elm$json$Json$Decode$int = _Json_decodeInt;
+var zaboco$elm_draggable$Draggable$whenLeftMouseButtonPressed = function (decoder) {
+	return A2(
+		elm$json$Json$Decode$andThen,
+		function (button) {
+			if (!button) {
+				return decoder;
+			} else {
+				return elm$json$Json$Decode$fail('Event is only relevant when the main mouse button was pressed.');
+			}
+		},
+		A2(elm$json$Json$Decode$field, 'button', elm$json$Json$Decode$int));
+};
+var zaboco$elm_draggable$Internal$StartDragging = F2(
+	function (a, b) {
+		return {$: 'StartDragging', a: a, b: b};
+	});
+var zaboco$elm_draggable$Draggable$baseDecoder = function (key) {
+	return zaboco$elm_draggable$Draggable$whenLeftMouseButtonPressed(
+		A2(
+			elm$json$Json$Decode$map,
+			A2(
+				elm$core$Basics$composeL,
+				zaboco$elm_draggable$Draggable$Msg,
+				zaboco$elm_draggable$Internal$StartDragging(key)),
+			zaboco$elm_draggable$Draggable$positionDecoder));
+};
+var zaboco$elm_draggable$Draggable$mouseTrigger = F2(
+	function (key, envelope) {
+		return A2(
+			elm$html$Html$Events$custom,
+			'mousedown',
+			A2(
+				elm$json$Json$Decode$map,
+				A2(elm$core$Basics$composeL, zaboco$elm_draggable$Draggable$alwaysPreventDefaultAndStopPropagation, envelope),
+				zaboco$elm_draggable$Draggable$baseDecoder(key)));
+	});
 var author$project$MapExample$view = function (model) {
 	return {
 		body: elm$core$List$singleton(
@@ -12403,14 +13179,17 @@ var author$project$MapExample$view = function (model) {
 											elm$svg$Svg$svg,
 											_List_fromArray(
 												[
-													elm$svg$Svg$Attributes$version('1.1'),
+													elm$svg$Svg$Attributes$version('1.2'),
+													elm$svg$Svg$Attributes$baseProfile('tiny'),
 													elm$svg$Svg$Attributes$width(
 													elm$core$String$fromInt(author$project$MapExample$svgWidth)),
 													elm$svg$Svg$Attributes$height(
 													elm$core$String$fromInt(author$project$MapExample$svgHeight)),
 													elm$svg$Svg$Attributes$preserveAspectRatio('xMidYMid meet'),
 													elm$svg$Svg$Attributes$viewBox(
-													author$project$MapExample$viewBoxStringCoords(model))
+													author$project$MapExample$viewBoxStringCoords(model)),
+													A2(zaboco$elm_draggable$Draggable$mouseTrigger, _Utils_Tuple0, author$project$MapExample$DragMsg),
+													author$project$MapExample$handleZoom(author$project$MapExample$ZoomScroll)
 												]),
 											_List_fromArray(
 												[
@@ -12526,11 +13305,14 @@ var author$project$MapExample$view = function (model) {
 															mdgriffith$elm_ui$Element$Input$labelAbove,
 															_List_Nil,
 															mdgriffith$elm_ui$Element$text(
-																'Zoom (' + (elm$core$String$fromFloat(model.zoomChoice) + ')'))),
-														max: 5.0,
-														min: 0.1,
+																'Zoom (x ' + (A2(
+																	elm$core$String$left,
+																	3,
+																	elm$core$String$fromFloat(model.zoomChoice)) + ')'))),
+														max: author$project$MapExample$maxZoom,
+														min: author$project$MapExample$minZoom,
 														onChange: author$project$MapExample$ZoomSliderChange,
-														step: elm$core$Maybe$Just(0.1),
+														step: elm$core$Maybe$Just(author$project$MapExample$stepZoom),
 														thumb: mdgriffith$elm_ui$Element$Input$defaultThumb,
 														value: model.zoomChoice
 													})
@@ -12586,223 +13368,6 @@ var author$project$MapExample$view = function (model) {
 						])))),
 		title: 'HexHeim'
 	};
-};
-var elm$browser$Browser$External = function (a) {
-	return {$: 'External', a: a};
-};
-var elm$browser$Browser$Internal = function (a) {
-	return {$: 'Internal', a: a};
-};
-var elm$browser$Browser$Dom$NotFound = function (a) {
-	return {$: 'NotFound', a: a};
-};
-var elm$core$Task$Perform = function (a) {
-	return {$: 'Perform', a: a};
-};
-var elm$core$Task$succeed = _Scheduler_succeed;
-var elm$core$Task$init = elm$core$Task$succeed(_Utils_Tuple0);
-var elm$core$Task$andThen = _Scheduler_andThen;
-var elm$core$Task$map = F2(
-	function (func, taskA) {
-		return A2(
-			elm$core$Task$andThen,
-			function (a) {
-				return elm$core$Task$succeed(
-					func(a));
-			},
-			taskA);
-	});
-var elm$core$Task$map2 = F3(
-	function (func, taskA, taskB) {
-		return A2(
-			elm$core$Task$andThen,
-			function (a) {
-				return A2(
-					elm$core$Task$andThen,
-					function (b) {
-						return elm$core$Task$succeed(
-							A2(func, a, b));
-					},
-					taskB);
-			},
-			taskA);
-	});
-var elm$core$Task$sequence = function (tasks) {
-	return A3(
-		elm$core$List$foldr,
-		elm$core$Task$map2(elm$core$List$cons),
-		elm$core$Task$succeed(_List_Nil),
-		tasks);
-};
-var elm$core$Platform$sendToApp = _Platform_sendToApp;
-var elm$core$Task$spawnCmd = F2(
-	function (router, _n0) {
-		var task = _n0.a;
-		return _Scheduler_spawn(
-			A2(
-				elm$core$Task$andThen,
-				elm$core$Platform$sendToApp(router),
-				task));
-	});
-var elm$core$Task$onEffects = F3(
-	function (router, commands, state) {
-		return A2(
-			elm$core$Task$map,
-			function (_n0) {
-				return _Utils_Tuple0;
-			},
-			elm$core$Task$sequence(
-				A2(
-					elm$core$List$map,
-					elm$core$Task$spawnCmd(router),
-					commands)));
-	});
-var elm$core$Task$onSelfMsg = F3(
-	function (_n0, _n1, _n2) {
-		return elm$core$Task$succeed(_Utils_Tuple0);
-	});
-var elm$core$Task$cmdMap = F2(
-	function (tagger, _n0) {
-		var task = _n0.a;
-		return elm$core$Task$Perform(
-			A2(elm$core$Task$map, tagger, task));
-	});
-_Platform_effectManagers['Task'] = _Platform_createManager(elm$core$Task$init, elm$core$Task$onEffects, elm$core$Task$onSelfMsg, elm$core$Task$cmdMap);
-var elm$core$Task$command = _Platform_leaf('Task');
-var elm$core$Task$perform = F2(
-	function (toMessage, task) {
-		return elm$core$Task$command(
-			elm$core$Task$Perform(
-				A2(elm$core$Task$map, toMessage, task)));
-	});
-var elm$core$String$length = _String_length;
-var elm$core$String$slice = _String_slice;
-var elm$core$String$dropLeft = F2(
-	function (n, string) {
-		return (n < 1) ? string : A3(
-			elm$core$String$slice,
-			n,
-			elm$core$String$length(string),
-			string);
-	});
-var elm$core$String$startsWith = _String_startsWith;
-var elm$url$Url$Http = {$: 'Http'};
-var elm$url$Url$Https = {$: 'Https'};
-var elm$core$String$indexes = _String_indexes;
-var elm$core$String$isEmpty = function (string) {
-	return string === '';
-};
-var elm$core$String$left = F2(
-	function (n, string) {
-		return (n < 1) ? '' : A3(elm$core$String$slice, 0, n, string);
-	});
-var elm$core$String$contains = _String_contains;
-var elm$core$String$toInt = _String_toInt;
-var elm$url$Url$Url = F6(
-	function (protocol, host, port_, path, query, fragment) {
-		return {fragment: fragment, host: host, path: path, port_: port_, protocol: protocol, query: query};
-	});
-var elm$url$Url$chompBeforePath = F5(
-	function (protocol, path, params, frag, str) {
-		if (elm$core$String$isEmpty(str) || A2(elm$core$String$contains, '@', str)) {
-			return elm$core$Maybe$Nothing;
-		} else {
-			var _n0 = A2(elm$core$String$indexes, ':', str);
-			if (!_n0.b) {
-				return elm$core$Maybe$Just(
-					A6(elm$url$Url$Url, protocol, str, elm$core$Maybe$Nothing, path, params, frag));
-			} else {
-				if (!_n0.b.b) {
-					var i = _n0.a;
-					var _n1 = elm$core$String$toInt(
-						A2(elm$core$String$dropLeft, i + 1, str));
-					if (_n1.$ === 'Nothing') {
-						return elm$core$Maybe$Nothing;
-					} else {
-						var port_ = _n1;
-						return elm$core$Maybe$Just(
-							A6(
-								elm$url$Url$Url,
-								protocol,
-								A2(elm$core$String$left, i, str),
-								port_,
-								path,
-								params,
-								frag));
-					}
-				} else {
-					return elm$core$Maybe$Nothing;
-				}
-			}
-		}
-	});
-var elm$url$Url$chompBeforeQuery = F4(
-	function (protocol, params, frag, str) {
-		if (elm$core$String$isEmpty(str)) {
-			return elm$core$Maybe$Nothing;
-		} else {
-			var _n0 = A2(elm$core$String$indexes, '/', str);
-			if (!_n0.b) {
-				return A5(elm$url$Url$chompBeforePath, protocol, '/', params, frag, str);
-			} else {
-				var i = _n0.a;
-				return A5(
-					elm$url$Url$chompBeforePath,
-					protocol,
-					A2(elm$core$String$dropLeft, i, str),
-					params,
-					frag,
-					A2(elm$core$String$left, i, str));
-			}
-		}
-	});
-var elm$url$Url$chompBeforeFragment = F3(
-	function (protocol, frag, str) {
-		if (elm$core$String$isEmpty(str)) {
-			return elm$core$Maybe$Nothing;
-		} else {
-			var _n0 = A2(elm$core$String$indexes, '?', str);
-			if (!_n0.b) {
-				return A4(elm$url$Url$chompBeforeQuery, protocol, elm$core$Maybe$Nothing, frag, str);
-			} else {
-				var i = _n0.a;
-				return A4(
-					elm$url$Url$chompBeforeQuery,
-					protocol,
-					elm$core$Maybe$Just(
-						A2(elm$core$String$dropLeft, i + 1, str)),
-					frag,
-					A2(elm$core$String$left, i, str));
-			}
-		}
-	});
-var elm$url$Url$chompAfterProtocol = F2(
-	function (protocol, str) {
-		if (elm$core$String$isEmpty(str)) {
-			return elm$core$Maybe$Nothing;
-		} else {
-			var _n0 = A2(elm$core$String$indexes, '#', str);
-			if (!_n0.b) {
-				return A3(elm$url$Url$chompBeforeFragment, protocol, elm$core$Maybe$Nothing, str);
-			} else {
-				var i = _n0.a;
-				return A3(
-					elm$url$Url$chompBeforeFragment,
-					protocol,
-					elm$core$Maybe$Just(
-						A2(elm$core$String$dropLeft, i + 1, str)),
-					A2(elm$core$String$left, i, str));
-			}
-		}
-	});
-var elm$url$Url$fromString = function (str) {
-	return A2(elm$core$String$startsWith, 'http://', str) ? A2(
-		elm$url$Url$chompAfterProtocol,
-		elm$url$Url$Http,
-		A2(elm$core$String$dropLeft, 7, str)) : (A2(elm$core$String$startsWith, 'https://', str) ? A2(
-		elm$url$Url$chompAfterProtocol,
-		elm$url$Url$Https,
-		A2(elm$core$String$dropLeft, 8, str)) : elm$core$Maybe$Nothing);
 };
 var elm$browser$Browser$document = _Browser_document;
 var author$project$MapExample$main = elm$browser$Browser$document(
