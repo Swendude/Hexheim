@@ -3,6 +3,7 @@ module MapExample exposing (main)
 import Browser exposing (Document)
 import Debug
 import Dict exposing (Dict)
+import Draggable
 import Element exposing (Element, column, el, padding, row)
 import Element.Background as Background
 import Element.Border as Border
@@ -12,6 +13,8 @@ import Hexagons.Hex exposing (..)
 import Hexagons.Layout exposing (..)
 import Hexagons.Map exposing (..)
 import Html exposing (Html)
+import Html.Events
+import Json.Decode as Decode exposing (Decoder)
 import List.Zipper exposing (Zipper, fromCons)
 import Maybe exposing (withDefault)
 import String
@@ -35,7 +38,7 @@ main =
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    Sub.none
+    Draggable.subscriptions DragMsg model.drag
 
 
 
@@ -125,6 +128,18 @@ bordergray =
     "#5a6046"
 
 
+minZoom =
+    0.1
+
+
+maxZoom =
+    5
+
+
+stepZoom =
+    0.1
+
+
 type Zoom
     = Factor Float
     | Normal
@@ -158,6 +173,7 @@ type alias Model =
     , typeMap : TypeMap
     , viewBoxX : Float
     , viewBoxY : Float
+    , drag : Draggable.State ()
     , zoom : Zoom
     , zoomChoice : Float
     }
@@ -174,6 +190,7 @@ emptyModel =
         }
     , viewBoxX = 0
     , viewBoxY = 0
+    , drag = Draggable.init
     , zoom = Factor 0.9
     , zoomChoice = 0.9
     }
@@ -186,6 +203,12 @@ init _ =
 
 
 -- UPDATE
+---- Drag config
+
+
+dragConfig : Draggable.Config () Msg
+dragConfig =
+    Draggable.basicConfig OnDragBy
 
 
 type Msg
@@ -197,11 +220,32 @@ type Msg
     | PanRight
     | ResetView
     | ZoomSliderChange Float
+    | ZoomScroll Float
+    | OnDragBy Draggable.Delta
+    | DragMsg (Draggable.Msg ())
 
 
 addHexType : Hash -> CellType -> TypeMap -> TypeMap
 addHexType hexh ctype tmap =
     { tmap | hexType = Dict.insert hexh ctype tmap.hexType }
+
+
+handleZoom : (Float -> msg) -> Svg.Attribute msg
+handleZoom onZoom =
+    let
+        alwaysPreventDefaultAndStopPropagation msg =
+            { message = msg, stopPropagation = True, preventDefault = True }
+
+        zoomDecoder : Decoder msg
+        zoomDecoder =
+            Decode.float
+                |> Decode.field "deltaY"
+                |> Decode.map onZoom
+    in
+    Html.Events.custom
+        "wheel"
+    <|
+        Decode.map alwaysPreventDefaultAndStopPropagation zoomDecoder
 
 
 normalZoom : Zoom -> Bool
@@ -236,10 +280,35 @@ update msg model =
             ( { model | viewBoxX = model.viewBoxX - 10 }, Cmd.none )
 
         ZoomSliderChange f ->
-            ( { model | zoom = Factor f, zoomChoice = f }, Cmd.none )
+            let
+                fcapped =
+                    clamp minZoom maxZoom f
+            in
+            ( { model | zoom = Factor fcapped, zoomChoice = fcapped }, Cmd.none )
+
+        ZoomScroll dy ->
+            let
+                posneg =
+                    case dy < 0 of
+                        False ->
+                            stepZoom
+
+                        True ->
+                            negate stepZoom
+
+                fcapped =
+                    clamp minZoom maxZoom (model.zoomChoice + posneg)
+            in
+            ( { model | zoom = Factor fcapped, zoomChoice = fcapped }, Cmd.none )
 
         ResetView ->
-            ( model, Cmd.none )
+            ( { model | zoom = Factor 0.9, zoomChoice = 0.9, viewBoxY = 0, viewBoxX = 0 }, Cmd.none )
+
+        OnDragBy ( dx, dy ) ->
+            ( { model | viewBoxX = model.viewBoxX - dx, viewBoxY = model.viewBoxY - dy }, Cmd.none )
+
+        DragMsg dragMsg ->
+            Draggable.update dragConfig dragMsg model
 
 
 
@@ -349,11 +418,14 @@ view model =
                           <|
                             Element.html <|
                                 svg
-                                    [ version "1.1"
+                                    [ version "1.2"
+                                    , baseProfile "tiny"
                                     , Svg.Attributes.width (String.fromInt svgWidth)
                                     , Svg.Attributes.height (String.fromInt svgHeight)
                                     , Svg.Attributes.preserveAspectRatio "xMidYMid meet"
                                     , viewBox (viewBoxStringCoords model)
+                                    , Draggable.mouseTrigger () DragMsg
+                                    , handleZoom ZoomScroll
                                     ]
                                     [ lazy hexGrid model
                                     ]
@@ -372,12 +444,12 @@ view model =
                                     , Element.padding 10
                                     ]
                                     { onChange = ZoomSliderChange
-                                    , label = Input.labelAbove [] <| Element.text ("Zoom (" ++ String.fromFloat model.zoomChoice ++ ")")
-                                    , min = 0.1
-                                    , max = 5.0
+                                    , label = Input.labelAbove [] <| Element.text ("Zoom (x " ++ (String.left 3 <| String.fromFloat model.zoomChoice) ++ ")")
+                                    , min = minZoom
+                                    , max = maxZoom
                                     , value = model.zoomChoice
                                     , thumb = Input.defaultThumb
-                                    , step = Just 0.1
+                                    , step = Just stepZoom
                                     }
                                 ]
                             , Element.row [ Element.spacing 10, Element.padding 10, Element.width Element.fill, Element.height <| Element.px 50 ]
@@ -506,9 +578,10 @@ toPolygon : Hash -> String -> List (Svg Msg)
 toPolygon hexLocation cornersCoords =
     [ polygon
         [ Svg.Attributes.style "cursor: pointer"
-        , attribute "vector-effect" "non-scaling-size"
+
+        -- , attribute "vector-effect" "non-scaling-size"
         , stroke "#000000"
-        , strokeWidth "2px"
+        , strokeWidth "1px"
         , fill watergray
         , strokeOpacity "0.1"
         , points cornersCoords
@@ -523,12 +596,15 @@ grassView : Hash -> String -> List (Svg Msg)
 grassView hexLocation cornersCoords =
     [ polygon
         [ Svg.Attributes.style "cursor: pointer"
-        , attribute "vector-effect" "non-scaling-size"
+        , attribute "shape-rendering" "optimizeSpeed"
+
+        -- , attribute "vector-effect" "non-scaling-size"
         , stroke "#003400"
-        , strokeWidth "2px"
-        , fill landgray
+        , strokeWidth "5px"
+        , fill "None"
         , points cornersCoords
-        , strokeOpacity "0.6"
+
+        -- , strokeOpacity "0.1"
         , Svg.Events.onMouseDown <|
             SetHex hexLocation
         ]
