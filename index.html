@@ -6203,6 +6203,46 @@ var author$project$MapExample$getCellKey = function (_n0) {
 	var hex = _n0.b;
 	return key;
 };
+var elm$core$Dict$get = F2(
+	function (targetKey, dict) {
+		get:
+		while (true) {
+			if (dict.$ === 'RBEmpty_elm_builtin') {
+				return elm$core$Maybe$Nothing;
+			} else {
+				var key = dict.b;
+				var value = dict.c;
+				var left = dict.d;
+				var right = dict.e;
+				var _n1 = A2(elm$core$Basics$compare, targetKey, key);
+				switch (_n1.$) {
+					case 'LT':
+						var $temp$targetKey = targetKey,
+							$temp$dict = left;
+						targetKey = $temp$targetKey;
+						dict = $temp$dict;
+						continue get;
+					case 'EQ':
+						return elm$core$Maybe$Just(value);
+					default:
+						var $temp$targetKey = targetKey,
+							$temp$dict = right;
+						targetKey = $temp$targetKey;
+						dict = $temp$dict;
+						continue get;
+				}
+			}
+		}
+	});
+var author$project$MapExample$isCellType = F3(
+	function (typemap, ct, hash) {
+		return _Utils_eq(
+			ct,
+			A2(
+				elm$core$Maybe$withDefault,
+				typemap._void,
+				A2(elm$core$Dict$get, hash, typemap.hexType)));
+	});
 var elm$core$Basics$pow = _Basics_pow;
 var Voronchuk$hexagons$Hexagons$Layout$precision = F2(
 	function (division, number) {
@@ -6327,36 +6367,16 @@ var author$project$MapExample$pointsToString = function (points) {
 		' ',
 		A2(elm$core$List$map, author$project$MapExample$pointToStringCoords, points));
 };
-var elm$core$Dict$get = F2(
-	function (targetKey, dict) {
-		get:
-		while (true) {
-			if (dict.$ === 'RBEmpty_elm_builtin') {
-				return elm$core$Maybe$Nothing;
-			} else {
-				var key = dict.b;
-				var value = dict.c;
-				var left = dict.d;
-				var right = dict.e;
-				var _n1 = A2(elm$core$Basics$compare, targetKey, key);
-				switch (_n1.$) {
-					case 'LT':
-						var $temp$targetKey = targetKey,
-							$temp$dict = left;
-						targetKey = $temp$targetKey;
-						dict = $temp$dict;
-						continue get;
-					case 'EQ':
-						return elm$core$Maybe$Just(value);
-					default:
-						var $temp$targetKey = targetKey,
-							$temp$dict = right;
-						targetKey = $temp$targetKey;
-						dict = $temp$dict;
-						continue get;
-				}
-			}
-		}
+var elm$core$List$filter = F2(
+	function (isGood, list) {
+		return A3(
+			elm$core$List$foldr,
+			F2(
+				function (x, xs) {
+					return isGood(x) ? A2(elm$core$List$cons, x, xs) : xs;
+				}),
+			_List_Nil,
+			list);
 	});
 var elm$core$Tuple$second = function (_n0) {
 	var y = _n0.b;
@@ -6364,46 +6384,52 @@ var elm$core$Tuple$second = function (_n0) {
 };
 var elm$svg$Svg$g = elm$svg$Svg$trustedNode('g');
 var elm$svg$Svg$Attributes$transform = _VirtualDom_attribute('transform');
-var author$project$MapExample$hexGrid = function (model) {
-	var hexView = function (hexLocation) {
-		var _n0 = A2(elm$core$Dict$get, hexLocation, model.typeMap.hexType);
-		if (_n0.$ === 'Just') {
-			var ctype = _n0.a;
-			return model.typeMap.typeView(ctype);
-		} else {
-			return model.typeMap.typeView(model.typeMap._void);
-		}
-	};
-	var toSvg = F2(
-		function (hexLocation, cornersCoords) {
-			return A2(
-				elm$svg$Svg$g,
-				_List_Nil,
-				A3(hexView, hexLocation, hexLocation, cornersCoords));
-		});
-	return A2(
-		elm$svg$Svg$g,
-		_List_fromArray(
-			[
-				elm$svg$Svg$Attributes$transform(
-				'translate(' + (elm$core$String$fromFloat((model.gridLayout.size.a * 2) / 2) + (' ' + (elm$core$String$fromFloat(
-					(model.gridLayout.size.b * elm$core$Basics$sqrt(3)) / 2) + ')'))))
-			]),
-		A3(
-			elm$core$List$map2,
-			toSvg,
-			A2(
-				elm$core$List$map,
-				author$project$MapExample$getCellKey,
-				elm$core$Dict$toList(model.map)),
-			A2(
-				elm$core$List$map,
+var author$project$MapExample$hexGrid = F2(
+	function (cellType, model) {
+		var hexView = function (hexLocation) {
+			var _n1 = A2(elm$core$Dict$get, hexLocation, model.typeMap.hexType);
+			if (_n1.$ === 'Just') {
+				var ctype = _n1.a;
+				return model.typeMap.typeView(ctype);
+			} else {
+				return model.typeMap.typeView(model.typeMap._void);
+			}
+		};
+		var toSvg = F2(
+			function (hexLocation, cornersCoords) {
+				return A2(
+					elm$svg$Svg$g,
+					_List_Nil,
+					A3(hexView, hexLocation, hexLocation, cornersCoords));
+			});
+		var cellList = A2(
+			elm$core$List$filter,
+			function (_n0) {
+				var hash = _n0.a;
+				var hex = _n0.b;
+				return A3(author$project$MapExample$isCellType, model.typeMap, cellType, hash);
+			},
+			elm$core$Dict$toList(model.map));
+		return A2(
+			elm$svg$Svg$g,
+			_List_fromArray(
+				[
+					elm$svg$Svg$Attributes$transform(
+					'translate(' + (elm$core$String$fromFloat((model.gridLayout.size.a * 2) / 2) + (' ' + (elm$core$String$fromFloat(
+						(model.gridLayout.size.b * elm$core$Basics$sqrt(3)) / 2) + ')'))))
+				]),
+			A3(
+				elm$core$List$map2,
+				toSvg,
+				A2(elm$core$List$map, author$project$MapExample$getCellKey, cellList),
 				A2(
-					elm$core$Basics$composeL,
-					A2(elm$core$Basics$composeL, author$project$MapExample$pointsToString, author$project$MapExample$mapPolygonCorners),
-					author$project$MapExample$getCell),
-				elm$core$Dict$toList(model.map))));
-};
+					elm$core$List$map,
+					A2(
+						elm$core$Basics$composeL,
+						A2(elm$core$Basics$composeL, author$project$MapExample$pointsToString, author$project$MapExample$mapPolygonCorners),
+						author$project$MapExample$getCell),
+					cellList)));
+	});
 var author$project$MapExample$lightgrey = A3(mdgriffith$elm_ui$Element$rgb255, 200, 200, 200);
 var author$project$MapExample$mint = A3(mdgriffith$elm_ui$Element$rgb255, 241, 250, 238);
 var author$project$MapExample$svgHeight = 600;
@@ -9743,17 +9769,6 @@ var mdgriffith$elm_ui$Internal$Model$renderNullAdjustmentRule = F2(
 				]));
 	});
 var elm$core$Basics$neq = _Utils_notEqual;
-var elm$core$List$filter = F2(
-	function (isGood, list) {
-		return A3(
-			elm$core$List$foldr,
-			F2(
-				function (x, xs) {
-					return isGood(x) ? A2(elm$core$List$cons, x, xs) : xs;
-				}),
-			_List_Nil,
-			list);
-	});
 var elm$core$List$maximum = function (list) {
 	if (list.b) {
 		var x = list.a;
@@ -13193,7 +13208,14 @@ var author$project$MapExample$view = function (model) {
 												]),
 											_List_fromArray(
 												[
-													A2(elm$svg$Svg$Lazy$lazy, author$project$MapExample$hexGrid, model)
+													A2(
+													elm$svg$Svg$Lazy$lazy,
+													author$project$MapExample$hexGrid(author$project$MapExample$Grass),
+													model),
+													A2(
+													elm$svg$Svg$Lazy$lazy,
+													author$project$MapExample$hexGrid(author$project$MapExample$Void),
+													model)
 												])))),
 									A2(
 									mdgriffith$elm_ui$Element$column,
