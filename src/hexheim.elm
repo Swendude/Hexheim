@@ -427,7 +427,8 @@ view model =
                                     , Draggable.mouseTrigger () DragMsg
                                     , handleZoom ZoomScroll
                                     ]
-                                    [ lazy hexGrid model
+                                    [ lazy (hexGrid Grass) model
+                                    , lazy (hexGrid Void) model
                                     ]
 
                         -- Control Element
@@ -475,8 +476,8 @@ view model =
     }
 
 
-hexGrid : Model -> Html Msg
-hexGrid model =
+hexGrid : CellType -> Model -> Html Msg
+hexGrid cellType model =
     let
         hexView : Hash -> (Hash -> String -> List (Svg Msg))
         hexView hexLocation =
@@ -492,6 +493,10 @@ hexGrid model =
             g
                 []
                 (hexView hexLocation hexLocation cornersCoords)
+
+        cellList : List ( Hash, Hex )
+        cellList =
+            List.filter (\( hash, hex ) -> isCellType model.typeMap cellType hash) (Dict.toList model.map)
     in
     g
         [ Svg.Attributes.transform
@@ -504,8 +509,13 @@ hexGrid model =
         ]
     <|
         List.map2 toSvg
-            (List.map getCellKey (Dict.toList model.map))
-            (List.map (pointsToString << mapPolygonCorners << getCell) (Dict.toList model.map))
+            (List.map getCellKey cellList)
+            (List.map (pointsToString << mapPolygonCorners << getCell) cellList)
+
+
+isCellType : TypeMap -> CellType -> Hash -> Bool
+isCellType typemap ct hash =
+    ct == Maybe.withDefault typemap.void (Dict.get hash typemap.hexType)
 
 
 {-| Helper to convert points to SVG string coordinates
