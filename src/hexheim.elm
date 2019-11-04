@@ -1,4 +1,4 @@
-module MapExample exposing (main)
+module Hexheim exposing (main)
 
 import Browser exposing (Document)
 import Debug
@@ -63,21 +63,14 @@ orientationLayoutFlat =
     }
 
 
-layout =
-    { orientation = orientationLayoutFlat
-    , size = ( 20.0, 20.0 )
-    , origin = ( 0.0, 0.0 )
-    }
-
-
 mapWidth : Int
 mapWidth =
-    50
+    100
 
 
 mapHeight : Int
 mapHeight =
-    30
+    60
 
 
 
@@ -136,6 +129,10 @@ bordergray =
     "#5a6046"
 
 
+bgcolor =
+    "#444f4c"
+
+
 minZoom =
     0.1
 
@@ -184,13 +181,18 @@ type alias Model =
     , drag : Draggable.State ()
     , zoom : Zoom
     , zoomChoice : Float
+    , viewPortLimits : ( Point, Point )
     }
 
 
 emptyModel : Model
 emptyModel =
     { map = rectangularFlatTopMap mapHeight mapWidth
-    , gridLayout = layout
+    , gridLayout =
+        { orientation = orientationLayoutFlat
+        , size = ( 20.0, 20.0 )
+        , origin = ( 0.0, 0.0 )
+        }
     , typeMap =
         { typeView = typeView
         , hexType = Dict.empty
@@ -201,12 +203,22 @@ emptyModel =
     , drag = Draggable.init
     , zoom = Factor 0.9
     , zoomChoice = 0.9
+    , viewPortLimits = ( ( 0.0, 0.0 ), ( 0.0, 0.0 ) )
     }
 
 
 init : flags -> ( Model, Cmd Msg )
 init _ =
-    ( emptyModel, Cmd.none )
+    ( { emptyModel | viewPortLimits = initViewPortLimits emptyModel }, Cmd.none )
+
+
+initViewPortLimits : Model -> ( Point, Point )
+initViewPortLimits model =
+    let
+        vbc =
+            viewBoxCoords model
+    in
+    ( ( vbc.x - (0.2 * vbc.width), vbc.y - (0.2 * vbc.height) ), ( 0.2 * vbc.width, 0.2 * vbc.height ) )
 
 
 
@@ -276,16 +288,56 @@ update msg model =
             ( { model | typeMap = addHexType cell Grass model.typeMap }, Cmd.none )
 
         PanUp ->
-            ( { model | viewBoxY = model.viewBoxY + 10 }, Cmd.none )
+            let
+                minY =
+                    Tuple.second <| Tuple.first model.viewPortLimits
+
+                maxY =
+                    Tuple.second <| Tuple.second model.viewPortLimits
+
+                newY =
+                    clamp minY maxY (model.viewBoxY + 10)
+            in
+            ( { model | viewBoxY = newY }, Cmd.none )
 
         PanDown ->
-            ( { model | viewBoxY = model.viewBoxY - 10 }, Cmd.none )
+            let
+                minY =
+                    Tuple.second <| Tuple.first model.viewPortLimits
+
+                maxY =
+                    Tuple.second <| Tuple.second model.viewPortLimits
+
+                newY =
+                    clamp minY maxY (model.viewBoxY - 10)
+            in
+            ( { model | viewBoxY = newY }, Cmd.none )
 
         PanLeft ->
-            ( { model | viewBoxX = model.viewBoxX + 10 }, Cmd.none )
+            let
+                minX =
+                    Tuple.first <| Tuple.first model.viewPortLimits
+
+                maxX =
+                    Tuple.first <| Tuple.second model.viewPortLimits
+
+                newX =
+                    clamp minX maxX (model.viewBoxX + 10)
+            in
+            ( { model | viewBoxX = newX }, Cmd.none )
 
         PanRight ->
-            ( { model | viewBoxX = model.viewBoxX - 10 }, Cmd.none )
+            let
+                minX =
+                    Tuple.first <| Tuple.first model.viewPortLimits
+
+                maxX =
+                    Tuple.first <| Tuple.second model.viewPortLimits
+
+                newX =
+                    clamp minX maxX (model.viewBoxX - 10)
+            in
+            ( { model | viewBoxX = newX }, Cmd.none )
 
         ZoomSliderChange f ->
             let
@@ -315,12 +367,30 @@ update msg model =
         OnDragBy ( dx, dy ) ->
             let
                 smoothdx =
-                    dx * 1.1
+                    dx * 1.5
 
                 smoothdy =
-                    dy * 1.1
+                    dy * 1.5
+
+                minX =
+                    Tuple.first <| Tuple.first model.viewPortLimits
+
+                minY =
+                    Tuple.second <| Tuple.first model.viewPortLimits
+
+                maxX =
+                    Tuple.first <| Tuple.second model.viewPortLimits
+
+                maxY =
+                    Tuple.second <| Tuple.second model.viewPortLimits
+
+                newX =
+                    clamp minX maxX (model.viewBoxX - smoothdx)
+
+                newY =
+                    clamp minY maxY (model.viewBoxY - smoothdy)
             in
-            ( { model | viewBoxX = model.viewBoxX - smoothdx, viewBoxY = model.viewBoxY - smoothdy }, Cmd.none )
+            ( { model | viewBoxX = newX, viewBoxY = newY }, Cmd.none )
 
         DragMsg dragMsg ->
             Draggable.update dragConfig dragMsg model
@@ -338,14 +408,22 @@ svgHeight =
     600
 
 
-viewBoxStringCoords : Model -> String
-viewBoxStringCoords model =
+type alias ViewBoxCoords =
+    { x : Float
+    , y : Float
+    , width : Float
+    , height : Float
+    }
+
+
+viewBoxCoords : Model -> ViewBoxCoords
+viewBoxCoords model =
     let
         sizeWidth =
-            Tuple.first layout.size
+            Tuple.first model.gridLayout.size
 
         sizeHeight =
-            Tuple.second layout.size
+            Tuple.second model.gridLayout.size
 
         cellWidth =
             2 * sizeWidth
@@ -367,13 +445,7 @@ viewBoxStringCoords model =
     in
     case model.zoom of
         Normal ->
-            String.fromFloat model.viewBoxX
-                ++ " "
-                ++ String.fromFloat model.viewBoxY
-                ++ " "
-                ++ String.fromFloat width
-                ++ " "
-                ++ String.fromFloat height
+            { x = model.viewBoxX, y = model.viewBoxY, width = width, height = height }
 
         Factor n ->
             let
@@ -389,17 +461,24 @@ viewBoxStringCoords model =
                 newY =
                     (height / 2) - (newHeight / 2) + model.viewBoxY
             in
-            String.fromFloat newX
-                ++ " "
-                ++ String.fromFloat newY
-                ++ " "
-                ++ String.fromFloat newWidth
-                ++ " "
-                ++ String.fromFloat newHeight
+            { x = newX
+            , y = newY
+            , width = newWidth
+            , height = newHeight
+            }
+
+
+stringFromViewBoxCoords : ViewBoxCoords -> String
+stringFromViewBoxCoords vbc =
+    String.fromFloat vbc.x ++ " " ++ String.fromFloat vbc.y ++ " " ++ String.fromFloat vbc.width ++ " " ++ String.fromFloat vbc.height
 
 
 view : Model -> Document Msg
 view model =
+    let
+        vbc =
+            viewBoxCoords model
+    in
     { title = "HexHeim"
     , body =
         List.singleton <|
@@ -424,7 +503,6 @@ view model =
                         ]
                         [ Element.el
                             [ Border.color black
-                            , Border.widthEach { bottom = 0, left = 0, right = 2, top = 0 }
                             , Background.color lightgrey
                             , Element.width <| Element.px svgWidth
                             , Element.alignLeft
@@ -433,16 +511,23 @@ view model =
                           <|
                             Element.html <|
                                 svg
-                                    [ version "1.2"
-                                    , baseProfile "tiny"
+                                    [ version "1.1"
                                     , Svg.Attributes.width (String.fromInt svgWidth)
                                     , Svg.Attributes.height (String.fromInt svgHeight)
                                     , Svg.Attributes.preserveAspectRatio "xMidYMid meet"
-                                    , viewBox (viewBoxStringCoords model)
+                                    , viewBox <| stringFromViewBoxCoords vbc
                                     , Draggable.mouseTrigger () DragMsg
                                     , handleZoom ZoomScroll
                                     ]
-                                    [ lazy (hexGrid Grass) model
+                                    [ Svg.rect
+                                        [ Svg.Attributes.x (String.fromFloat (vbc.x - vbc.width))
+                                        , Svg.Attributes.y (String.fromFloat (vbc.y - vbc.height))
+                                        , Svg.Attributes.height (String.fromFloat (vbc.height * 2.5))
+                                        , Svg.Attributes.width (String.fromFloat (vbc.width * 2.5))
+                                        , Svg.Attributes.fill bgcolor
+                                        ]
+                                        []
+                                    , lazy (hexGrid Grass) model
                                     , lazy (hexGrid Void) model
                                     ]
 
@@ -474,8 +559,6 @@ view model =
                             ]
                         ]
 
-                    -- Input.button [ Background.color lightgrey, Element.width <| Element.px 45 ] { onPress = Just PanReset, label = Element.el [ Element.centerX, Element.centerY ] <| Element.text "Center View" }
-                    -- , Input.button [ Background.color lightgrey, Element.width <| Element.px 45 ] { onPress = Just PanLeft, label = Element.el [ Element.centerX, Element.centerY ] <| Element.text "Normal Zoom" }
                     -- Footer
                     , row
                         [ Background.color black
@@ -532,7 +615,7 @@ hexGrid cellType model =
     <|
         List.map2 toSvg
             (List.map getCellKey cellList)
-            (List.map (pointsToString << mapPolygonCorners << getCell) cellList)
+            (List.map (pointsToString << polygonCorners model.gridLayout << getCell) cellList)
 
 
 isCellType : TypeMap -> CellType -> Hash -> Bool
@@ -564,9 +647,10 @@ getCellKey ( key, hex ) =
     key
 
 
-mapPolygonCorners : Hex -> List Point
-mapPolygonCorners =
-    polygonCorners layout
+
+-- mapPolygonCorners : Layout -> Hex -> List Point
+-- mapPolygonCorners =
+--     polygonCorners layout
 
 
 rectangularFlatTopMap : Int -> Int -> Map
