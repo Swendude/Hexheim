@@ -120,8 +120,16 @@ watergray =
     "#86a39c"
 
 
+watergrayshade =
+    "#43524e"
+
+
 landgray =
     "#b7af92"
+
+
+landgrayshade =
+    "#5c5849"
 
 
 bordergray =
@@ -305,7 +313,14 @@ update msg model =
             ( { model | zoom = Factor 0.9, zoomChoice = 0.9, viewBoxY = 0, viewBoxX = 0 }, Cmd.none )
 
         OnDragBy ( dx, dy ) ->
-            ( { model | viewBoxX = model.viewBoxX - dx, viewBoxY = model.viewBoxY - dy }, Cmd.none )
+            let
+                smoothdx =
+                    dx * 1.1
+
+                smoothdy =
+                    dy * 1.1
+            in
+            ( { model | viewBoxX = model.viewBoxX - smoothdx, viewBoxY = model.viewBoxY - smoothdy }, Cmd.none )
 
         DragMsg dragMsg ->
             Draggable.update dragConfig dragMsg model
@@ -469,8 +484,15 @@ view model =
                         , Element.width Element.fill
                         , Element.height Element.shrink
                         , padding 5
+                        , Element.spacing 10
                         ]
-                        [ el [] (Element.text "Made by @Swendude.")
+                        [ el [ Element.alignLeft ] (Element.text "Made by @Swendude.")
+                        , el [ Element.alignRight ]
+                            (Element.newTabLink [ Font.color (Element.rgb255 100 100 255), Font.underline ]
+                                { url = "https://github.com/Swendude/Hexheim"
+                                , label = Element.text "Check source"
+                                }
+                            )
                         ]
                     ]
     }
@@ -590,10 +612,9 @@ toPolygon hexLocation cornersCoords =
         [ Svg.Attributes.style "cursor: pointer"
 
         -- , attribute "vector-effect" "non-scaling-size"
-        , stroke "#000000"
+        , stroke watergrayshade
         , strokeWidth "1px"
         , fill watergray
-        , strokeOpacity "0.1"
         , points cornersCoords
         , Svg.Events.onMouseDown <|
             SetHex hexLocation
@@ -607,11 +628,9 @@ grassView hexLocation cornersCoords =
     [ polygon
         [ Svg.Attributes.style "cursor: pointer"
         , attribute "shape-rendering" "optimizeSpeed"
-
-        -- , attribute "vector-effect" "non-scaling-size"
-        , stroke "#003400"
-        , strokeWidth "5px"
-        , fill "None"
+        , stroke landgrayshade
+        , strokeWidth "1px"
+        , fill landgray
         , points cornersCoords
 
         -- , strokeOpacity "0.1"
