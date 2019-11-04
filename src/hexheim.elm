@@ -167,13 +167,32 @@ typeView ctype =
 
 type alias TypeMap =
     { typeView : CellType -> (Hash -> String -> List (Svg Msg))
-    , hexType : Dict Hash CellType
     , void : CellType
     }
 
 
+type alias HexInfo =
+    { hex : Hex
+    , hexType : CellType
+    }
+
+
+type alias HexHeimMap =
+    Dict Hash HexInfo
+
+
+hexHeimToNormalMap : HexHeimMap -> Map
+hexHeimToNormalMap =
+    Dict.map mapHexFromInfo
+
+
+mapHexFromInfo : Hash -> HexInfo -> Hex
+mapHexFromInfo _ hi =
+    hi.hex
+
+
 type alias Model =
-    { map : Map
+    { map : HexHeimMap
     , gridLayout : Layout
     , typeMap : TypeMap
     , viewBoxX : Float
@@ -181,13 +200,14 @@ type alias Model =
     , drag : Draggable.State ()
     , zoom : Zoom
     , zoomChoice : Float
+    , brushChoice : Int
     , viewPortLimits : ( Point, Point )
     }
 
 
 emptyModel : Model
 emptyModel =
-    { map = rectangularFlatTopMap mapHeight mapWidth
+    { map = rectangularFlatTopMap Void mapHeight mapWidth
     , gridLayout =
         { orientation = orientationLayoutFlat
         , size = ( 20.0, 20.0 )
@@ -195,7 +215,6 @@ emptyModel =
         }
     , typeMap =
         { typeView = typeView
-        , hexType = Dict.empty
         , void = Void
         }
     , viewBoxX = 0
@@ -203,6 +222,7 @@ emptyModel =
     , drag = Draggable.init
     , zoom = Factor 0.9
     , zoomChoice = 0.9
+    , brushChoice = 1
     , viewPortLimits = ( ( 0.0, 0.0 ), ( 0.0, 0.0 ) )
     }
 
@@ -240,14 +260,36 @@ type Msg
     | PanRight
     | ResetView
     | ZoomSliderChange Float
+    | BrushSliderChange Int
     | ZoomScroll Float
     | OnDragBy Draggable.Delta
     | DragMsg (Draggable.Msg ())
 
 
-addHexType : Hash -> CellType -> TypeMap -> TypeMap
-addHexType hexh ctype tmap =
-    { tmap | hexType = Dict.insert hexh ctype tmap.hexType }
+updateHexesType : CellType -> List Hash -> HexHeimMap -> HexHeimMap
+updateHexesType ct hexes hhmap =
+    List.foldl (hexFold ct) hhmap hexes
+
+
+updateHexType : CellType -> Maybe HexInfo -> Maybe HexInfo
+updateHexType ct hexInfo =
+    case hexInfo of
+        Just hexInfo_ ->
+            Just { hexInfo_ | hexType = ct }
+
+        Nothing ->
+            Nothing
+
+
+hexFold : CellType -> Hash -> HexHeimMap -> HexHeimMap
+hexFold ct hex hhmap =
+    Dict.update hex (updateHexType ct) hhmap
+
+
+
+-- setHexType : Hash -> CellType -> HexHeimMap -> HexHeimMap
+-- setHexType hexh ctype hhmap =
+--     Dict.insert hexh
 
 
 handleZoom : (Float -> msg) -> Svg.Attribute msg
@@ -285,7 +327,24 @@ update msg model =
             ( model, Cmd.none )
 
         SetHex cell ->
-            ( { model | typeMap = addHexType cell Grass model.typeMap }, Cmd.none )
+            let
+                defaultdirections = List.map Hexagons.Hex.direction [ NE, E, SE, SW, W, NW ]
+                directions =
+                    case model.brushChoice of
+                        1 ->
+                            defaultdirections
+
+                        n ->
+                            List.foldl (++) [] (List.map (\i -> List.map (Hexagons.Hex.mul i)  defaultdirections) (List.range 1 n))
+
+                hexcell =
+                    Maybe.withDefault (Hexagons.Hex.intFactory ( 0, 0 )) (Dict.get cell (hexHeimToNormalMap model.map))
+
+                neighbors : List Hash
+                neighbors =
+                    [ cell ] ++ (List.map hashHex <| List.map (\dir -> Hexagons.Hex.add hexcell  dir) directions)
+            in
+            ( { model | map = updateHexesType Grass neighbors model.map }, Cmd.none )
 
         PanUp ->
             let
@@ -346,6 +405,9 @@ update msg model =
             in
             ( { model | zoom = Factor fcapped, zoomChoice = fcapped }, Cmd.none )
 
+        BrushSliderChange f ->
+            ( { model | brushChoice = f }, Cmd.none )
+
         ZoomScroll dy ->
             let
                 posneg =
@@ -401,11 +463,11 @@ update msg model =
 
 
 svgWidth =
-    800
+    1200
 
 
 svgHeight =
-    600
+    800
 
 
 type alias ViewBoxCoords =
@@ -539,7 +601,7 @@ view model =
                                 , Input.button [ Background.color lightgrey, Element.width <| Element.px 45 ] { onPress = Just PanRight, label = Element.el [ Element.centerX, Element.centerY ] <| Element.text "<" }
                                 , Input.button [ Background.color lightgrey, Element.width <| Element.px 45 ] { onPress = Just PanLeft, label = Element.el [ Element.centerX, Element.centerY ] <| Element.text ">" }
                                 ]
-                            , Element.row [ Element.spacing 10, Element.padding 10, Element.width Element.fill, Element.height <| Element.px 50 ]
+                            , Element.row [ Element.spacing 10, Element.padding 10, Element.width <| Element.fillPortion 5, Element.height <| Element.px 50 ]
                                 [ Input.slider
                                     [ Background.color lightgrey
                                     , Element.padding 10
@@ -555,6 +617,20 @@ view model =
                                 ]
                             , Element.row [ Element.spacing 10, Element.padding 10, Element.width Element.fill, Element.height <| Element.px 50 ]
                                 [ Input.button [ Background.color lightgrey, Element.padding 10 ] { onPress = Just ResetView, label = Element.el [ Element.centerX, Element.centerY ] <| Element.text "Reset View" }
+                                ]
+                            , Element.row [ Element.spacing 10, Element.padding 10, Element.width <| Element.fillPortion 5, Element.height <| Element.px 50 ]
+                                [ Input.slider
+                                    [ Background.color lightgrey
+                                    , Element.padding 10
+                                    ]
+                                    { onChange = round >> BrushSliderChange
+                                    , label = Input.labelAbove [] <| Element.text ("Brush size (" ++ String.fromInt model.brushChoice ++ ")")
+                                    , min = 1.0
+                                    , max = 5.0
+                                    , value = toFloat model.brushChoice
+                                    , thumb = Input.defaultThumb
+                                    , step = Just 1
+                                    }
                                 ]
                             ]
                         ]
@@ -586,9 +662,9 @@ hexGrid cellType model =
     let
         hexView : Hash -> (Hash -> String -> List (Svg Msg))
         hexView hexLocation =
-            case Dict.get hexLocation model.typeMap.hexType of
-                Just ctype ->
-                    model.typeMap.typeView ctype
+            case Dict.get hexLocation model.map of
+                Just hexInfo ->
+                    model.typeMap.typeView hexInfo.hexType
 
                 Nothing ->
                     model.typeMap.typeView model.typeMap.void
@@ -601,7 +677,7 @@ hexGrid cellType model =
 
         cellList : List ( Hash, Hex )
         cellList =
-            List.filter (\( hash, hex ) -> isCellType model.typeMap cellType hash) (Dict.toList model.map)
+            List.map (\( hash, hexInfo ) -> ( hash, hexInfo.hex )) <| List.filter (\( hash, hexInfo ) -> hexInfo.hexType == cellType) (Dict.toList model.map)
     in
     g
         [ Svg.Attributes.transform
@@ -618,9 +694,10 @@ hexGrid cellType model =
             (List.map (pointsToString << polygonCorners model.gridLayout << getCell) cellList)
 
 
-isCellType : TypeMap -> CellType -> Hash -> Bool
-isCellType typemap ct hash =
-    ct == Maybe.withDefault typemap.void (Dict.get hash typemap.hexType)
+
+-- isCellType : TypeMap -> CellType -> Hash -> Bool
+-- isCellType typemap ct hash =
+--     ct == Maybe.withDefault typemap.void (Dict.get hash typemap.hexType)
 
 
 {-| Helper to convert points to SVG string coordinates
@@ -653,8 +730,8 @@ getCellKey ( key, hex ) =
 --     polygonCorners layout
 
 
-rectangularFlatTopMap : Int -> Int -> Map
-rectangularFlatTopMap height width =
+rectangularFlatTopMap : CellType -> Int -> Int -> HexHeimMap
+rectangularFlatTopMap defaultCellType height width =
     let
         qlist =
             List.range 0 (width - 1)
@@ -677,9 +754,9 @@ rectangularFlatTopMap height width =
             List.concat <|
                 List.map widthRowLine qlist
 
-        makeDictRecord : Hex -> ( Hash, Hex )
+        makeDictRecord : Hex -> ( Hash, HexInfo )
         makeDictRecord hex =
-            ( hashHex hex, hex )
+            ( hashHex hex, { hex = hex, hexType = defaultCellType } )
     in
     Dict.fromList <| List.map makeDictRecord <| allLines
 
