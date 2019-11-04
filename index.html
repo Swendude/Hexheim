@@ -5154,8 +5154,6 @@ var $author$project$Hexheim$Factor = function (a) {
 	return {$: 'Factor', a: a};
 };
 var $author$project$Hexheim$Void = {$: 'Void'};
-var $elm$core$Dict$RBEmpty_elm_builtin = {$: 'RBEmpty_elm_builtin'};
-var $elm$core$Dict$empty = $elm$core$Dict$RBEmpty_elm_builtin;
 var $zaboco$elm_draggable$Internal$NotDragging = {$: 'NotDragging'};
 var $zaboco$elm_draggable$Draggable$State = function (a) {
 	return {$: 'State', a: a};
@@ -5193,6 +5191,8 @@ var $elm$core$List$append = F2(
 var $elm$core$List$concat = function (lists) {
 	return A3($elm$core$List$foldr, $elm$core$List$append, _List_Nil, lists);
 };
+var $elm$core$Dict$RBEmpty_elm_builtin = {$: 'RBEmpty_elm_builtin'};
+var $elm$core$Dict$empty = $elm$core$Dict$RBEmpty_elm_builtin;
 var $elm$core$Dict$Black = {$: 'Black'};
 var $elm$core$Dict$RBNode_elm_builtin = F5(
 	function (a, b, c, d, e) {
@@ -5428,13 +5428,13 @@ var $Voronchuk$hexagons$Hexagons$Hex$intFactory = function (_v0) {
 	return $Voronchuk$hexagons$Hexagons$Hex$IntCubeHex(
 		_Utils_Tuple3(q_, r_, (-q_) - r_));
 };
-var $author$project$Hexheim$rectangularFlatTopMap = F2(
-	function (height, width) {
+var $author$project$Hexheim$rectangularFlatTopMap = F3(
+	function (defaultCellType, height, width) {
 		var qlist = A2($elm$core$List$range, 0, width - 1);
 		var makeDictRecord = function (hex) {
 			return _Utils_Tuple2(
 				$Voronchuk$hexagons$Hexagons$Map$hashHex(hex),
-				hex);
+				{hex: hex, hexType: defaultCellType});
 		};
 		var createHex = F2(
 			function (qv, rv) {
@@ -5538,14 +5538,15 @@ var $author$project$Hexheim$typeView = function (ctype) {
 	}
 };
 var $author$project$Hexheim$emptyModel = {
+	brushChoice: 1,
 	drag: $zaboco$elm_draggable$Draggable$init,
 	gridLayout: {
 		orientation: $author$project$Hexheim$orientationLayoutFlat,
 		origin: _Utils_Tuple2(0.0, 0.0),
 		size: _Utils_Tuple2(20.0, 20.0)
 	},
-	map: A2($author$project$Hexheim$rectangularFlatTopMap, $author$project$Hexheim$mapHeight, $author$project$Hexheim$mapWidth),
-	typeMap: {hexType: $elm$core$Dict$empty, typeView: $author$project$Hexheim$typeView, _void: $author$project$Hexheim$Void},
+	map: A3($author$project$Hexheim$rectangularFlatTopMap, $author$project$Hexheim$Void, $author$project$Hexheim$mapHeight, $author$project$Hexheim$mapWidth),
+	typeMap: {typeView: $author$project$Hexheim$typeView, _void: $author$project$Hexheim$Void},
 	viewBoxX: 0,
 	viewBoxY: 0,
 	viewPortLimits: _Utils_Tuple2(
@@ -5933,19 +5934,139 @@ var $zaboco$elm_draggable$Draggable$subscriptions = F2(
 var $author$project$Hexheim$subscriptions = function (model) {
 	return A2($zaboco$elm_draggable$Draggable$subscriptions, $author$project$Hexheim$DragMsg, model.drag);
 };
+var $Voronchuk$hexagons$Hexagons$Hex$E = {$: 'E'};
 var $author$project$Hexheim$Grass = {$: 'Grass'};
-var $author$project$Hexheim$addHexType = F3(
-	function (hexh, ctype, tmap) {
-		return _Utils_update(
-			tmap,
-			{
-				hexType: A3($elm$core$Dict$insert, hexh, ctype, tmap.hexType)
-			});
+var $Voronchuk$hexagons$Hexagons$Hex$NE = {$: 'NE'};
+var $Voronchuk$hexagons$Hexagons$Hex$NW = {$: 'NW'};
+var $Voronchuk$hexagons$Hexagons$Hex$SE = {$: 'SE'};
+var $Voronchuk$hexagons$Hexagons$Hex$SW = {$: 'SW'};
+var $Voronchuk$hexagons$Hexagons$Hex$W = {$: 'W'};
+var $Voronchuk$hexagons$Hexagons$Hex$FloatCubeHex = function (a) {
+	return {$: 'FloatCubeHex', a: a};
+};
+var $Voronchuk$hexagons$Hexagons$Hex$add = F2(
+	function (a, b) {
+		switch (a.$) {
+			case 'AxialHex':
+				var _v1 = a.a;
+				var a1 = _v1.a;
+				var a2 = _v1.b;
+				switch (b.$) {
+					case 'AxialHex':
+						var _v3 = b.a;
+						var b1 = _v3.a;
+						var b2 = _v3.b;
+						return $Voronchuk$hexagons$Hexagons$Hex$IntCubeHex(
+							_Utils_Tuple3(a1 + b1, a2 + b2, ((-a1) - a2) + ((-b1) - b2)));
+					case 'IntCubeHex':
+						var _v4 = b.a;
+						var b1 = _v4.a;
+						var b2 = _v4.b;
+						var b3 = _v4.c;
+						return $Voronchuk$hexagons$Hexagons$Hex$IntCubeHex(
+							_Utils_Tuple3(a1 + b1, a2 + b2, ((-a1) - a2) + b3));
+					default:
+						var _v5 = b.a;
+						var b1 = _v5.a;
+						var b2 = _v5.b;
+						var b3 = _v5.c;
+						var a2_ = a2;
+						var a1_ = a1;
+						var a3_ = (-a1_) - a2_;
+						return $Voronchuk$hexagons$Hexagons$Hex$FloatCubeHex(
+							_Utils_Tuple3(a1_ + b1, a2_ + b2, a3_ + b3));
+				}
+			case 'IntCubeHex':
+				var _v6 = a.a;
+				var a1 = _v6.a;
+				var a2 = _v6.b;
+				var a3 = _v6.c;
+				switch (b.$) {
+					case 'AxialHex':
+						var _v8 = b.a;
+						var b1 = _v8.a;
+						var b2 = _v8.b;
+						return $Voronchuk$hexagons$Hexagons$Hex$IntCubeHex(
+							_Utils_Tuple3(a1 + b1, a2 + b2, a3 + ((-b1) - b2)));
+					case 'IntCubeHex':
+						var _v9 = b.a;
+						var b1 = _v9.a;
+						var b2 = _v9.b;
+						var b3 = _v9.c;
+						return $Voronchuk$hexagons$Hexagons$Hex$IntCubeHex(
+							_Utils_Tuple3(a1 + b1, a2 + b2, a3 + b3));
+					default:
+						var _v10 = b.a;
+						var b1 = _v10.a;
+						var b2 = _v10.b;
+						var b3 = _v10.c;
+						var a3_ = a3;
+						var a2_ = a2;
+						var a1_ = a1;
+						return $Voronchuk$hexagons$Hexagons$Hex$FloatCubeHex(
+							_Utils_Tuple3(a1_ + b1, a2_ + b2, a3_ + b3));
+				}
+			default:
+				var _v11 = a.a;
+				var a1 = _v11.a;
+				var a2 = _v11.b;
+				var a3 = _v11.c;
+				switch (b.$) {
+					case 'AxialHex':
+						var _v13 = b.a;
+						var b1 = _v13.a;
+						var b2 = _v13.b;
+						var b2_ = b2;
+						var b1_ = b1;
+						var b3_ = (-b1_) - b2_;
+						return $Voronchuk$hexagons$Hexagons$Hex$FloatCubeHex(
+							_Utils_Tuple3(a1 + b1_, a2 + b2_, a3 + b3_));
+					case 'IntCubeHex':
+						var _v14 = b.a;
+						var b1 = _v14.a;
+						var b2 = _v14.b;
+						var b3 = _v14.c;
+						var b3_ = b3;
+						var b2_ = b2;
+						var b1_ = b1;
+						return $Voronchuk$hexagons$Hexagons$Hex$FloatCubeHex(
+							_Utils_Tuple3(a1 + b1_, a2 + b2_, a3 + b3_));
+					default:
+						var _v15 = b.a;
+						var b1 = _v15.a;
+						var b2 = _v15.b;
+						var b3 = _v15.c;
+						return $Voronchuk$hexagons$Hexagons$Hex$FloatCubeHex(
+							_Utils_Tuple3(a1 + b1, a2 + b2, a3 + b3));
+				}
+		}
 	});
 var $elm$core$Basics$clamp = F3(
 	function (low, high, number) {
 		return (_Utils_cmp(number, low) < 0) ? low : ((_Utils_cmp(number, high) > 0) ? high : number);
 	});
+var $Voronchuk$hexagons$Hexagons$Hex$direction = function (dir) {
+	switch (dir.$) {
+		case 'NE':
+			return $Voronchuk$hexagons$Hexagons$Hex$IntCubeHex(
+				_Utils_Tuple3(1, 0, -1));
+		case 'E':
+			return $Voronchuk$hexagons$Hexagons$Hex$IntCubeHex(
+				_Utils_Tuple3(1, -1, 0));
+		case 'SE':
+			return $Voronchuk$hexagons$Hexagons$Hex$IntCubeHex(
+				_Utils_Tuple3(0, -1, 1));
+		case 'SW':
+			return $Voronchuk$hexagons$Hexagons$Hex$IntCubeHex(
+				_Utils_Tuple3(-1, 0, 1));
+		case 'W':
+			return $Voronchuk$hexagons$Hexagons$Hex$IntCubeHex(
+				_Utils_Tuple3(-1, 1, 0));
+		default:
+			return $Voronchuk$hexagons$Hexagons$Hex$IntCubeHex(
+				_Utils_Tuple3(0, 1, -1));
+	}
+};
 var $author$project$Hexheim$OnDragBy = function (a) {
 	return {$: 'OnDragBy', a: a};
 };
@@ -5977,8 +6098,92 @@ var $zaboco$elm_draggable$Draggable$basicConfig = function (onDragByListener) {
 			}));
 };
 var $author$project$Hexheim$dragConfig = $zaboco$elm_draggable$Draggable$basicConfig($author$project$Hexheim$OnDragBy);
+var $elm$core$Dict$get = F2(
+	function (targetKey, dict) {
+		get:
+		while (true) {
+			if (dict.$ === 'RBEmpty_elm_builtin') {
+				return $elm$core$Maybe$Nothing;
+			} else {
+				var key = dict.b;
+				var value = dict.c;
+				var left = dict.d;
+				var right = dict.e;
+				var _v1 = A2($elm$core$Basics$compare, targetKey, key);
+				switch (_v1.$) {
+					case 'LT':
+						var $temp$targetKey = targetKey,
+							$temp$dict = left;
+						targetKey = $temp$targetKey;
+						dict = $temp$dict;
+						continue get;
+					case 'EQ':
+						return $elm$core$Maybe$Just(value);
+					default:
+						var $temp$targetKey = targetKey,
+							$temp$dict = right;
+						targetKey = $temp$targetKey;
+						dict = $temp$dict;
+						continue get;
+				}
+			}
+		}
+	});
+var $elm$core$Dict$map = F2(
+	function (func, dict) {
+		if (dict.$ === 'RBEmpty_elm_builtin') {
+			return $elm$core$Dict$RBEmpty_elm_builtin;
+		} else {
+			var color = dict.a;
+			var key = dict.b;
+			var value = dict.c;
+			var left = dict.d;
+			var right = dict.e;
+			return A5(
+				$elm$core$Dict$RBNode_elm_builtin,
+				color,
+				key,
+				A2(func, key, value),
+				A2($elm$core$Dict$map, func, left),
+				A2($elm$core$Dict$map, func, right));
+		}
+	});
+var $author$project$Hexheim$mapHexFromInfo = F2(
+	function (_v0, hi) {
+		return hi.hex;
+	});
+var $author$project$Hexheim$hexHeimToNormalMap = $elm$core$Dict$map($author$project$Hexheim$mapHexFromInfo);
 var $author$project$Hexheim$maxZoom = 5;
 var $author$project$Hexheim$minZoom = 0.1;
+var $Voronchuk$hexagons$Hexagons$Hex$AxialHex = function (a) {
+	return {$: 'AxialHex', a: a};
+};
+var $Voronchuk$hexagons$Hexagons$Hex$mul = F2(
+	function (k, a) {
+		switch (a.$) {
+			case 'AxialHex':
+				var _v1 = a.a;
+				var a1 = _v1.a;
+				var a2 = _v1.b;
+				return $Voronchuk$hexagons$Hexagons$Hex$AxialHex(
+					_Utils_Tuple2(a1 * k, a2 * k));
+			case 'IntCubeHex':
+				var _v2 = a.a;
+				var a1 = _v2.a;
+				var a2 = _v2.b;
+				var a3 = _v2.c;
+				return $Voronchuk$hexagons$Hexagons$Hex$IntCubeHex(
+					_Utils_Tuple3(a1 * k, a2 * k, a3 * k));
+			default:
+				var _v3 = a.a;
+				var a1 = _v3.a;
+				var a2 = _v3.b;
+				var a3 = _v3.c;
+				var k_ = k;
+				return $Voronchuk$hexagons$Hexagons$Hex$FloatCubeHex(
+					_Utils_Tuple3(a1 * k_, a2 * k_, a3 * k_));
+		}
+	});
 var $author$project$Hexheim$stepZoom = 0.1;
 var $elm$core$Maybe$map = F2(
 	function (f, maybe) {
@@ -6101,6 +6306,407 @@ var $zaboco$elm_draggable$Draggable$update = F3(
 				{drag: dragState}),
 			dragCmd);
 	});
+var $elm$core$Dict$getMin = function (dict) {
+	getMin:
+	while (true) {
+		if ((dict.$ === 'RBNode_elm_builtin') && (dict.d.$ === 'RBNode_elm_builtin')) {
+			var left = dict.d;
+			var $temp$dict = left;
+			dict = $temp$dict;
+			continue getMin;
+		} else {
+			return dict;
+		}
+	}
+};
+var $elm$core$Dict$moveRedLeft = function (dict) {
+	if (((dict.$ === 'RBNode_elm_builtin') && (dict.d.$ === 'RBNode_elm_builtin')) && (dict.e.$ === 'RBNode_elm_builtin')) {
+		if ((dict.e.d.$ === 'RBNode_elm_builtin') && (dict.e.d.a.$ === 'Red')) {
+			var clr = dict.a;
+			var k = dict.b;
+			var v = dict.c;
+			var _v1 = dict.d;
+			var lClr = _v1.a;
+			var lK = _v1.b;
+			var lV = _v1.c;
+			var lLeft = _v1.d;
+			var lRight = _v1.e;
+			var _v2 = dict.e;
+			var rClr = _v2.a;
+			var rK = _v2.b;
+			var rV = _v2.c;
+			var rLeft = _v2.d;
+			var _v3 = rLeft.a;
+			var rlK = rLeft.b;
+			var rlV = rLeft.c;
+			var rlL = rLeft.d;
+			var rlR = rLeft.e;
+			var rRight = _v2.e;
+			return A5(
+				$elm$core$Dict$RBNode_elm_builtin,
+				$elm$core$Dict$Red,
+				rlK,
+				rlV,
+				A5(
+					$elm$core$Dict$RBNode_elm_builtin,
+					$elm$core$Dict$Black,
+					k,
+					v,
+					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Red, lK, lV, lLeft, lRight),
+					rlL),
+				A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Black, rK, rV, rlR, rRight));
+		} else {
+			var clr = dict.a;
+			var k = dict.b;
+			var v = dict.c;
+			var _v4 = dict.d;
+			var lClr = _v4.a;
+			var lK = _v4.b;
+			var lV = _v4.c;
+			var lLeft = _v4.d;
+			var lRight = _v4.e;
+			var _v5 = dict.e;
+			var rClr = _v5.a;
+			var rK = _v5.b;
+			var rV = _v5.c;
+			var rLeft = _v5.d;
+			var rRight = _v5.e;
+			if (clr.$ === 'Black') {
+				return A5(
+					$elm$core$Dict$RBNode_elm_builtin,
+					$elm$core$Dict$Black,
+					k,
+					v,
+					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Red, lK, lV, lLeft, lRight),
+					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Red, rK, rV, rLeft, rRight));
+			} else {
+				return A5(
+					$elm$core$Dict$RBNode_elm_builtin,
+					$elm$core$Dict$Black,
+					k,
+					v,
+					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Red, lK, lV, lLeft, lRight),
+					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Red, rK, rV, rLeft, rRight));
+			}
+		}
+	} else {
+		return dict;
+	}
+};
+var $elm$core$Dict$moveRedRight = function (dict) {
+	if (((dict.$ === 'RBNode_elm_builtin') && (dict.d.$ === 'RBNode_elm_builtin')) && (dict.e.$ === 'RBNode_elm_builtin')) {
+		if ((dict.d.d.$ === 'RBNode_elm_builtin') && (dict.d.d.a.$ === 'Red')) {
+			var clr = dict.a;
+			var k = dict.b;
+			var v = dict.c;
+			var _v1 = dict.d;
+			var lClr = _v1.a;
+			var lK = _v1.b;
+			var lV = _v1.c;
+			var _v2 = _v1.d;
+			var _v3 = _v2.a;
+			var llK = _v2.b;
+			var llV = _v2.c;
+			var llLeft = _v2.d;
+			var llRight = _v2.e;
+			var lRight = _v1.e;
+			var _v4 = dict.e;
+			var rClr = _v4.a;
+			var rK = _v4.b;
+			var rV = _v4.c;
+			var rLeft = _v4.d;
+			var rRight = _v4.e;
+			return A5(
+				$elm$core$Dict$RBNode_elm_builtin,
+				$elm$core$Dict$Red,
+				lK,
+				lV,
+				A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Black, llK, llV, llLeft, llRight),
+				A5(
+					$elm$core$Dict$RBNode_elm_builtin,
+					$elm$core$Dict$Black,
+					k,
+					v,
+					lRight,
+					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Red, rK, rV, rLeft, rRight)));
+		} else {
+			var clr = dict.a;
+			var k = dict.b;
+			var v = dict.c;
+			var _v5 = dict.d;
+			var lClr = _v5.a;
+			var lK = _v5.b;
+			var lV = _v5.c;
+			var lLeft = _v5.d;
+			var lRight = _v5.e;
+			var _v6 = dict.e;
+			var rClr = _v6.a;
+			var rK = _v6.b;
+			var rV = _v6.c;
+			var rLeft = _v6.d;
+			var rRight = _v6.e;
+			if (clr.$ === 'Black') {
+				return A5(
+					$elm$core$Dict$RBNode_elm_builtin,
+					$elm$core$Dict$Black,
+					k,
+					v,
+					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Red, lK, lV, lLeft, lRight),
+					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Red, rK, rV, rLeft, rRight));
+			} else {
+				return A5(
+					$elm$core$Dict$RBNode_elm_builtin,
+					$elm$core$Dict$Black,
+					k,
+					v,
+					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Red, lK, lV, lLeft, lRight),
+					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Red, rK, rV, rLeft, rRight));
+			}
+		}
+	} else {
+		return dict;
+	}
+};
+var $elm$core$Dict$removeHelpPrepEQGT = F7(
+	function (targetKey, dict, color, key, value, left, right) {
+		if ((left.$ === 'RBNode_elm_builtin') && (left.a.$ === 'Red')) {
+			var _v1 = left.a;
+			var lK = left.b;
+			var lV = left.c;
+			var lLeft = left.d;
+			var lRight = left.e;
+			return A5(
+				$elm$core$Dict$RBNode_elm_builtin,
+				color,
+				lK,
+				lV,
+				lLeft,
+				A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Red, key, value, lRight, right));
+		} else {
+			_v2$2:
+			while (true) {
+				if ((right.$ === 'RBNode_elm_builtin') && (right.a.$ === 'Black')) {
+					if (right.d.$ === 'RBNode_elm_builtin') {
+						if (right.d.a.$ === 'Black') {
+							var _v3 = right.a;
+							var _v4 = right.d;
+							var _v5 = _v4.a;
+							return $elm$core$Dict$moveRedRight(dict);
+						} else {
+							break _v2$2;
+						}
+					} else {
+						var _v6 = right.a;
+						var _v7 = right.d;
+						return $elm$core$Dict$moveRedRight(dict);
+					}
+				} else {
+					break _v2$2;
+				}
+			}
+			return dict;
+		}
+	});
+var $elm$core$Dict$removeMin = function (dict) {
+	if ((dict.$ === 'RBNode_elm_builtin') && (dict.d.$ === 'RBNode_elm_builtin')) {
+		var color = dict.a;
+		var key = dict.b;
+		var value = dict.c;
+		var left = dict.d;
+		var lColor = left.a;
+		var lLeft = left.d;
+		var right = dict.e;
+		if (lColor.$ === 'Black') {
+			if ((lLeft.$ === 'RBNode_elm_builtin') && (lLeft.a.$ === 'Red')) {
+				var _v3 = lLeft.a;
+				return A5(
+					$elm$core$Dict$RBNode_elm_builtin,
+					color,
+					key,
+					value,
+					$elm$core$Dict$removeMin(left),
+					right);
+			} else {
+				var _v4 = $elm$core$Dict$moveRedLeft(dict);
+				if (_v4.$ === 'RBNode_elm_builtin') {
+					var nColor = _v4.a;
+					var nKey = _v4.b;
+					var nValue = _v4.c;
+					var nLeft = _v4.d;
+					var nRight = _v4.e;
+					return A5(
+						$elm$core$Dict$balance,
+						nColor,
+						nKey,
+						nValue,
+						$elm$core$Dict$removeMin(nLeft),
+						nRight);
+				} else {
+					return $elm$core$Dict$RBEmpty_elm_builtin;
+				}
+			}
+		} else {
+			return A5(
+				$elm$core$Dict$RBNode_elm_builtin,
+				color,
+				key,
+				value,
+				$elm$core$Dict$removeMin(left),
+				right);
+		}
+	} else {
+		return $elm$core$Dict$RBEmpty_elm_builtin;
+	}
+};
+var $elm$core$Dict$removeHelp = F2(
+	function (targetKey, dict) {
+		if (dict.$ === 'RBEmpty_elm_builtin') {
+			return $elm$core$Dict$RBEmpty_elm_builtin;
+		} else {
+			var color = dict.a;
+			var key = dict.b;
+			var value = dict.c;
+			var left = dict.d;
+			var right = dict.e;
+			if (_Utils_cmp(targetKey, key) < 0) {
+				if ((left.$ === 'RBNode_elm_builtin') && (left.a.$ === 'Black')) {
+					var _v4 = left.a;
+					var lLeft = left.d;
+					if ((lLeft.$ === 'RBNode_elm_builtin') && (lLeft.a.$ === 'Red')) {
+						var _v6 = lLeft.a;
+						return A5(
+							$elm$core$Dict$RBNode_elm_builtin,
+							color,
+							key,
+							value,
+							A2($elm$core$Dict$removeHelp, targetKey, left),
+							right);
+					} else {
+						var _v7 = $elm$core$Dict$moveRedLeft(dict);
+						if (_v7.$ === 'RBNode_elm_builtin') {
+							var nColor = _v7.a;
+							var nKey = _v7.b;
+							var nValue = _v7.c;
+							var nLeft = _v7.d;
+							var nRight = _v7.e;
+							return A5(
+								$elm$core$Dict$balance,
+								nColor,
+								nKey,
+								nValue,
+								A2($elm$core$Dict$removeHelp, targetKey, nLeft),
+								nRight);
+						} else {
+							return $elm$core$Dict$RBEmpty_elm_builtin;
+						}
+					}
+				} else {
+					return A5(
+						$elm$core$Dict$RBNode_elm_builtin,
+						color,
+						key,
+						value,
+						A2($elm$core$Dict$removeHelp, targetKey, left),
+						right);
+				}
+			} else {
+				return A2(
+					$elm$core$Dict$removeHelpEQGT,
+					targetKey,
+					A7($elm$core$Dict$removeHelpPrepEQGT, targetKey, dict, color, key, value, left, right));
+			}
+		}
+	});
+var $elm$core$Dict$removeHelpEQGT = F2(
+	function (targetKey, dict) {
+		if (dict.$ === 'RBNode_elm_builtin') {
+			var color = dict.a;
+			var key = dict.b;
+			var value = dict.c;
+			var left = dict.d;
+			var right = dict.e;
+			if (_Utils_eq(targetKey, key)) {
+				var _v1 = $elm$core$Dict$getMin(right);
+				if (_v1.$ === 'RBNode_elm_builtin') {
+					var minKey = _v1.b;
+					var minValue = _v1.c;
+					return A5(
+						$elm$core$Dict$balance,
+						color,
+						minKey,
+						minValue,
+						left,
+						$elm$core$Dict$removeMin(right));
+				} else {
+					return $elm$core$Dict$RBEmpty_elm_builtin;
+				}
+			} else {
+				return A5(
+					$elm$core$Dict$balance,
+					color,
+					key,
+					value,
+					left,
+					A2($elm$core$Dict$removeHelp, targetKey, right));
+			}
+		} else {
+			return $elm$core$Dict$RBEmpty_elm_builtin;
+		}
+	});
+var $elm$core$Dict$remove = F2(
+	function (key, dict) {
+		var _v0 = A2($elm$core$Dict$removeHelp, key, dict);
+		if ((_v0.$ === 'RBNode_elm_builtin') && (_v0.a.$ === 'Red')) {
+			var _v1 = _v0.a;
+			var k = _v0.b;
+			var v = _v0.c;
+			var l = _v0.d;
+			var r = _v0.e;
+			return A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Black, k, v, l, r);
+		} else {
+			var x = _v0;
+			return x;
+		}
+	});
+var $elm$core$Dict$update = F3(
+	function (targetKey, alter, dictionary) {
+		var _v0 = alter(
+			A2($elm$core$Dict$get, targetKey, dictionary));
+		if (_v0.$ === 'Just') {
+			var value = _v0.a;
+			return A3($elm$core$Dict$insert, targetKey, value, dictionary);
+		} else {
+			return A2($elm$core$Dict$remove, targetKey, dictionary);
+		}
+	});
+var $author$project$Hexheim$updateHexType = F2(
+	function (ct, hexInfo) {
+		if (hexInfo.$ === 'Just') {
+			var hexInfo_ = hexInfo.a;
+			return $elm$core$Maybe$Just(
+				_Utils_update(
+					hexInfo_,
+					{hexType: ct}));
+		} else {
+			return $elm$core$Maybe$Nothing;
+		}
+	});
+var $author$project$Hexheim$hexFold = F3(
+	function (ct, hex, hhmap) {
+		return A3(
+			$elm$core$Dict$update,
+			hex,
+			$author$project$Hexheim$updateHexType(ct),
+			hhmap);
+	});
+var $author$project$Hexheim$updateHexesType = F3(
+	function (ct, hexes, hhmap) {
+		return A3(
+			$elm$core$List$foldl,
+			$author$project$Hexheim$hexFold(ct),
+			hhmap,
+			hexes);
+	});
 var $author$project$Hexheim$update = F2(
 	function (msg, model) {
 		switch (msg.$) {
@@ -6108,11 +6714,57 @@ var $author$project$Hexheim$update = F2(
 				return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 			case 'SetHex':
 				var cell = msg.a;
+				var hexcell = A2(
+					$elm$core$Maybe$withDefault,
+					$Voronchuk$hexagons$Hexagons$Hex$intFactory(
+						_Utils_Tuple2(0, 0)),
+					A2(
+						$elm$core$Dict$get,
+						cell,
+						$author$project$Hexheim$hexHeimToNormalMap(model.map)));
+				var defaultdirections = A2(
+					$elm$core$List$map,
+					$Voronchuk$hexagons$Hexagons$Hex$direction,
+					_List_fromArray(
+						[$Voronchuk$hexagons$Hexagons$Hex$NE, $Voronchuk$hexagons$Hexagons$Hex$E, $Voronchuk$hexagons$Hexagons$Hex$SE, $Voronchuk$hexagons$Hexagons$Hex$SW, $Voronchuk$hexagons$Hexagons$Hex$W, $Voronchuk$hexagons$Hexagons$Hex$NW]));
+				var directions = function () {
+					var _v1 = model.brushChoice;
+					if (_v1 === 1) {
+						return defaultdirections;
+					} else {
+						var n = _v1;
+						return A3(
+							$elm$core$List$foldl,
+							$elm$core$Basics$append,
+							_List_Nil,
+							A2(
+								$elm$core$List$map,
+								function (i) {
+									return A2(
+										$elm$core$List$map,
+										$Voronchuk$hexagons$Hexagons$Hex$mul(i),
+										defaultdirections);
+								},
+								A2($elm$core$List$range, 1, n)));
+					}
+				}();
+				var neighbors = _Utils_ap(
+					_List_fromArray(
+						[cell]),
+					A2(
+						$elm$core$List$map,
+						$Voronchuk$hexagons$Hexagons$Map$hashHex,
+						A2(
+							$elm$core$List$map,
+							function (dir) {
+								return A2($Voronchuk$hexagons$Hexagons$Hex$add, hexcell, dir);
+							},
+							directions)));
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
 						{
-							typeMap: A3($author$project$Hexheim$addHexType, cell, $author$project$Hexheim$Grass, model.typeMap)
+							map: A3($author$project$Hexheim$updateHexesType, $author$project$Hexheim$Grass, neighbors, model.map)
 						}),
 					$elm$core$Platform$Cmd$none);
 			case 'PanUp':
@@ -6162,11 +6814,18 @@ var $author$project$Hexheim$update = F2(
 							zoomChoice: fcapped
 						}),
 					$elm$core$Platform$Cmd$none);
+			case 'BrushSliderChange':
+				var f = msg.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{brushChoice: f}),
+					$elm$core$Platform$Cmd$none);
 			case 'ZoomScroll':
 				var dy = msg.a;
 				var posneg = function () {
-					var _v1 = dy < 0;
-					if (!_v1) {
+					var _v2 = dy < 0;
+					if (!_v2) {
 						return $author$project$Hexheim$stepZoom;
 					} else {
 						return -$author$project$Hexheim$stepZoom;
@@ -6193,9 +6852,9 @@ var $author$project$Hexheim$update = F2(
 						}),
 					$elm$core$Platform$Cmd$none);
 			case 'OnDragBy':
-				var _v2 = msg.a;
-				var dx = _v2.a;
-				var dy = _v2.b;
+				var _v3 = msg.a;
+				var dx = _v3.a;
+				var dy = _v3.b;
 				var smoothdy = dy * 1.5;
 				var smoothdx = dx * 1.5;
 				var minY = model.viewPortLimits.a.b;
@@ -6214,6 +6873,9 @@ var $author$project$Hexheim$update = F2(
 				return A3($zaboco$elm_draggable$Draggable$update, $author$project$Hexheim$dragConfig, dragMsg, model);
 		}
 	});
+var $author$project$Hexheim$BrushSliderChange = function (a) {
+	return {$: 'BrushSliderChange', a: a};
+};
 var $author$project$Hexheim$PanDown = {$: 'PanDown'};
 var $author$project$Hexheim$PanLeft = {$: 'PanLeft'};
 var $author$project$Hexheim$PanRight = {$: 'PanRight'};
@@ -6542,37 +7204,6 @@ var $elm$core$Set$insert = F2(
 		var dict = _v0.a;
 		return $elm$core$Set$Set_elm_builtin(
 			A3($elm$core$Dict$insert, key, _Utils_Tuple0, dict));
-	});
-var $elm$core$Dict$get = F2(
-	function (targetKey, dict) {
-		get:
-		while (true) {
-			if (dict.$ === 'RBEmpty_elm_builtin') {
-				return $elm$core$Maybe$Nothing;
-			} else {
-				var key = dict.b;
-				var value = dict.c;
-				var left = dict.d;
-				var right = dict.e;
-				var _v1 = A2($elm$core$Basics$compare, targetKey, key);
-				switch (_v1.$) {
-					case 'LT':
-						var $temp$targetKey = targetKey,
-							$temp$dict = left;
-						targetKey = $temp$targetKey;
-						dict = $temp$dict;
-						continue get;
-					case 'EQ':
-						return $elm$core$Maybe$Just(value);
-					default:
-						var $temp$targetKey = targetKey,
-							$temp$dict = right;
-						targetKey = $temp$targetKey;
-						dict = $temp$dict;
-						continue get;
-				}
-			}
-		}
 	});
 var $elm$core$Dict$member = F2(
 	function (key, dict) {
@@ -11835,6 +12466,11 @@ var $mdgriffith$elm_ui$Element$column = F2(
 						attrs))),
 			$mdgriffith$elm_ui$Internal$Model$Unkeyed(children));
 	});
+var $elm$core$Basics$composeR = F3(
+	function (f, g, x) {
+		return g(
+			f(x));
+	});
 var $author$project$Hexheim$darkblue = A3($mdgriffith$elm_ui$Element$rgb255, 29, 53, 87);
 var $mdgriffith$elm_ui$Element$Input$Thumb = function (a) {
 	return {$: 'Thumb', a: a};
@@ -11945,15 +12581,6 @@ var $author$project$Hexheim$getCellKey = function (_v0) {
 	var hex = _v0.b;
 	return key;
 };
-var $author$project$Hexheim$isCellType = F3(
-	function (typemap, ct, hash) {
-		return _Utils_eq(
-			ct,
-			A2(
-				$elm$core$Maybe$withDefault,
-				typemap._void,
-				A2($elm$core$Dict$get, hash, typemap.hexType)));
-	});
 var $author$project$Hexheim$pointToStringCoords = function (_v0) {
 	var x = _v0.a;
 	var y = _v0.b;
@@ -12080,10 +12707,10 @@ var $elm$svg$Svg$Attributes$transform = _VirtualDom_attribute('transform');
 var $author$project$Hexheim$hexGrid = F2(
 	function (cellType, model) {
 		var hexView = function (hexLocation) {
-			var _v1 = A2($elm$core$Dict$get, hexLocation, model.typeMap.hexType);
-			if (_v1.$ === 'Just') {
-				var ctype = _v1.a;
-				return model.typeMap.typeView(ctype);
+			var _v2 = A2($elm$core$Dict$get, hexLocation, model.map);
+			if (_v2.$ === 'Just') {
+				var hexInfo = _v2.a;
+				return model.typeMap.typeView(hexInfo.hexType);
 			} else {
 				return model.typeMap.typeView(model.typeMap._void);
 			}
@@ -12096,13 +12723,20 @@ var $author$project$Hexheim$hexGrid = F2(
 					A3(hexView, hexLocation, hexLocation, cornersCoords));
 			});
 		var cellList = A2(
-			$elm$core$List$filter,
+			$elm$core$List$map,
 			function (_v0) {
 				var hash = _v0.a;
-				var hex = _v0.b;
-				return A3($author$project$Hexheim$isCellType, model.typeMap, cellType, hash);
+				var hexInfo = _v0.b;
+				return _Utils_Tuple2(hash, hexInfo.hex);
 			},
-			$elm$core$Dict$toList(model.map));
+			A2(
+				$elm$core$List$filter,
+				function (_v1) {
+					var hash = _v1.a;
+					var hexInfo = _v1.b;
+					return _Utils_eq(hexInfo.hexType, cellType);
+				},
+				$elm$core$Dict$toList(model.map)));
 		return A2(
 			$elm$svg$Svg$g,
 			_List_fromArray(
@@ -13185,8 +13819,8 @@ var $author$project$Hexheim$stringFromViewBoxCoords = function (vbc) {
 	return $elm$core$String$fromFloat(vbc.x) + (' ' + ($elm$core$String$fromFloat(vbc.y) + (' ' + ($elm$core$String$fromFloat(vbc.width) + (' ' + $elm$core$String$fromFloat(vbc.height))))));
 };
 var $elm$svg$Svg$svg = $elm$svg$Svg$trustedNode('svg');
-var $author$project$Hexheim$svgHeight = 600;
-var $author$project$Hexheim$svgWidth = 800;
+var $author$project$Hexheim$svgHeight = 800;
+var $author$project$Hexheim$svgWidth = 1200;
 var $mdgriffith$elm_ui$Element$text = function (content) {
 	return $mdgriffith$elm_ui$Internal$Model$Text(content);
 };
@@ -13386,7 +14020,8 @@ var $author$project$Hexheim$view = function (model) {
 												[
 													$mdgriffith$elm_ui$Element$spacing(10),
 													$mdgriffith$elm_ui$Element$padding(10),
-													$mdgriffith$elm_ui$Element$width($mdgriffith$elm_ui$Element$fill),
+													$mdgriffith$elm_ui$Element$width(
+													$mdgriffith$elm_ui$Element$fillPortion(5)),
 													$mdgriffith$elm_ui$Element$height(
 													$mdgriffith$elm_ui$Element$px(50))
 												]),
@@ -13442,6 +14077,40 @@ var $author$project$Hexheim$view = function (model) {
 																[$mdgriffith$elm_ui$Element$centerX, $mdgriffith$elm_ui$Element$centerY]),
 															$mdgriffith$elm_ui$Element$text('Reset View')),
 														onPress: $elm$core$Maybe$Just($author$project$Hexheim$ResetView)
+													})
+												])),
+											A2(
+											$mdgriffith$elm_ui$Element$row,
+											_List_fromArray(
+												[
+													$mdgriffith$elm_ui$Element$spacing(10),
+													$mdgriffith$elm_ui$Element$padding(10),
+													$mdgriffith$elm_ui$Element$width(
+													$mdgriffith$elm_ui$Element$fillPortion(5)),
+													$mdgriffith$elm_ui$Element$height(
+													$mdgriffith$elm_ui$Element$px(50))
+												]),
+											_List_fromArray(
+												[
+													A2(
+													$mdgriffith$elm_ui$Element$Input$slider,
+													_List_fromArray(
+														[
+															$mdgriffith$elm_ui$Element$Background$color($author$project$Hexheim$lightgrey),
+															$mdgriffith$elm_ui$Element$padding(10)
+														]),
+													{
+														label: A2(
+															$mdgriffith$elm_ui$Element$Input$labelAbove,
+															_List_Nil,
+															$mdgriffith$elm_ui$Element$text(
+																'Brush size (' + ($elm$core$String$fromInt(model.brushChoice) + ')'))),
+														max: 5.0,
+														min: 1.0,
+														onChange: A2($elm$core$Basics$composeR, $elm$core$Basics$round, $author$project$Hexheim$BrushSliderChange),
+														step: $elm$core$Maybe$Just(1),
+														thumb: $mdgriffith$elm_ui$Element$Input$defaultThumb,
+														value: model.brushChoice
 													})
 												]))
 										]))
