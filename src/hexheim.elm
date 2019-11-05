@@ -21,6 +21,7 @@ import String
 import Svg exposing (..)
 import Svg.Attributes exposing (..)
 import Svg.Events exposing (..)
+import Svg.Keyed exposing (node)
 import Svg.Lazy exposing (lazy, lazy2, lazy3)
 import Task
 import VirtualDom exposing (attribute)
@@ -155,7 +156,7 @@ type CellType
     | Void
 
 
-typeView : CellType -> (Hash -> String -> List (Svg Msg))
+typeView : CellType -> (Hash -> String -> Svg Msg)
 typeView ctype =
     case ctype of
         Grass ->
@@ -166,7 +167,7 @@ typeView ctype =
 
 
 type alias TypeMap =
-    { typeView : CellType -> (Hash -> String -> List (Svg Msg))
+    { typeView : CellType -> (Hash -> String -> Svg Msg)
     , void : CellType
     }
 
@@ -328,21 +329,23 @@ update msg model =
 
         SetHex cell ->
             let
-                defaultdirections = List.map Hexagons.Hex.direction [ NE, E, SE, SW, W, NW ]
+                defaultdirections =
+                    List.map Hexagons.Hex.direction [ NE, E, SE, SW, W, NW ]
+
                 directions =
                     case model.brushChoice of
                         1 ->
                             defaultdirections
 
                         n ->
-                            List.foldl (++) [] (List.map (\i -> List.map (Hexagons.Hex.mul i)  defaultdirections) (List.range 1 n))
+                            List.foldl (++) [] (List.map (\i -> List.map (Hexagons.Hex.mul i) defaultdirections) (List.range 1 n))
 
                 hexcell =
                     Maybe.withDefault (Hexagons.Hex.intFactory ( 0, 0 )) (Dict.get cell (hexHeimToNormalMap model.map))
 
                 neighbors : List Hash
                 neighbors =
-                    [ cell ] ++ (List.map hashHex <| List.map (\dir -> Hexagons.Hex.add hexcell  dir) directions)
+                    [ cell ] ++ (List.map hashHex <| List.map (\dir -> Hexagons.Hex.add hexcell dir) directions)
             in
             ( { model | map = updateHexesType Grass neighbors model.map }, Cmd.none )
 
@@ -463,11 +466,11 @@ update msg model =
 
 
 svgWidth =
-    1200
+    800
 
 
 svgHeight =
-    800
+    610
 
 
 type alias ViewBoxCoords =
@@ -589,8 +592,8 @@ view model =
                                         , Svg.Attributes.fill bgcolor
                                         ]
                                         []
-                                    , lazy (hexGrid Grass) model
-                                    , lazy (hexGrid Void) model
+                                    , lazy2 hexGrid Grass model
+                                    , lazy2 hexGrid Void model
                                     ]
 
                         -- Control Element
@@ -660,7 +663,7 @@ view model =
 hexGrid : CellType -> Model -> Html Msg
 hexGrid cellType model =
     let
-        hexView : Hash -> (Hash -> String -> List (Svg Msg))
+        hexView : Hash -> (Hash -> String -> Svg Msg)
         hexView hexLocation =
             case Dict.get hexLocation model.map of
                 Just hexInfo ->
@@ -669,17 +672,15 @@ hexGrid cellType model =
                 Nothing ->
                     model.typeMap.typeView model.typeMap.void
 
-        toSvg : Hash -> String -> Svg Msg
+        toSvg : Hash -> String -> ( String, Svg Msg )
         toSvg hexLocation cornersCoords =
-            g
-                []
-                (hexView hexLocation hexLocation cornersCoords)
+            ( hashToString hexLocation, hexView hexLocation hexLocation cornersCoords )
 
         cellList : List ( Hash, Hex )
         cellList =
             List.map (\( hash, hexInfo ) -> ( hash, hexInfo.hex )) <| List.filter (\( hash, hexInfo ) -> hexInfo.hexType == cellType) (Dict.toList model.map)
     in
-    g
+    Svg.Keyed.node "g"
         [ Svg.Attributes.transform
             ("translate("
                 ++ String.fromFloat ((Tuple.first model.gridLayout.size * 2) / 2)
@@ -705,6 +706,13 @@ hexGrid cellType model =
 pointsToString : List Point -> String
 pointsToString points =
     String.join " " (List.map pointToStringCoords points)
+
+
+{-| Helper to print Hashes
+-}
+hashToString : Hash -> String
+hashToString ( q, r, s ) =
+    "( " ++ String.fromInt q ++ ", " ++ String.fromInt r ++ ", " ++ String.fromInt s ++ " )"
 
 
 {-| Helper to convert points to SVG string coordinates
@@ -767,9 +775,9 @@ rectangularFlatTopMap defaultCellType height width =
 
 {-| Default cellView
 -}
-toPolygon : Hash -> String -> List (Svg Msg)
+toPolygon : Hash -> String -> Svg Msg
 toPolygon hexLocation cornersCoords =
-    [ polygon
+    polygon
         [ Svg.Attributes.style "cursor: pointer"
 
         -- , attribute "vector-effect" "non-scaling-size"
@@ -781,12 +789,11 @@ toPolygon hexLocation cornersCoords =
             SetHex hexLocation
         ]
         []
-    ]
 
 
-grassView : Hash -> String -> List (Svg Msg)
+grassView : Hash -> String -> Svg Msg
 grassView hexLocation cornersCoords =
-    [ polygon
+    polygon
         [ Svg.Attributes.style "cursor: pointer"
         , attribute "shape-rendering" "optimizeSpeed"
         , stroke landgrayshade
@@ -799,4 +806,3 @@ grassView hexLocation cornersCoords =
             SetHex hexLocation
         ]
         []
-    ]
