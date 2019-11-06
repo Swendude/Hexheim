@@ -15,6 +15,7 @@ import Hexagons.Map exposing (..)
 import Html exposing (Html)
 import Html.Events
 import Json.Decode as Decode exposing (Decoder)
+import List.Extra exposing (cartesianProduct)
 import List.Zipper exposing (Zipper, fromCons)
 import Maybe exposing (withDefault)
 import String
@@ -333,12 +334,7 @@ update msg model =
                     List.map Hexagons.Hex.direction [ NE, E, SE, SW, W, NW ]
 
                 directions =
-                    case model.brushChoice of
-                        1 ->
-                            defaultdirections
-
-                        n ->
-                            List.foldl (++) [] (List.map (\i -> List.map (Hexagons.Hex.mul i) defaultdirections) (List.range 1 n))
+                    hexCircle (hashToHex cell) model.brushChoice
 
                 hexcell =
                     Maybe.withDefault (Hexagons.Hex.intFactory ( 0, 0 )) (Dict.get cell (hexHeimToNormalMap model.map))
@@ -674,7 +670,7 @@ hexGrid cellType model =
 
         toSvg : Hash -> String -> ( String, Svg Msg )
         toSvg hexLocation cornersCoords =
-            ( hashToString hexLocation, hexView hexLocation hexLocation cornersCoords )
+            ( hashToString hexLocation, lazy2 (hexView hexLocation) hexLocation cornersCoords )
 
         cellList : List ( Hash, Hex )
         cellList =
@@ -693,12 +689,6 @@ hexGrid cellType model =
         List.map2 toSvg
             (List.map getCellKey cellList)
             (List.map (pointsToString << polygonCorners model.gridLayout << getCell) cellList)
-
-
-
--- isCellType : TypeMap -> CellType -> Hash -> Bool
--- isCellType typemap ct hash =
---     ct == Maybe.withDefault typemap.void (Dict.get hash typemap.hexType)
 
 
 {-| Helper to convert points to SVG string coordinates
@@ -727,15 +717,36 @@ getCell ( key, hex ) =
     hex
 
 
+hashToHex : Hash -> Hex
+hashToHex =
+    IntCubeHex
+
+
 getCellKey : ( Hash, Hex ) -> Hash
 getCellKey ( key, hex ) =
     key
 
 
+listToHex : List Int -> Maybe Hex
+listToHex list =
+    case list of
+        [ a, b, c ] ->
+            Just <| IntCubeHex ( a, b, c )
 
--- mapPolygonCorners : Layout -> Hex -> List Point
--- mapPolygonCorners =
---     polygonCorners layout
+        _ ->
+            Nothing
+
+
+hexCircle : Hex -> Int -> List Hex
+hexCircle center radius =
+    let
+        ranges =
+            [ List.range (negate radius) radius
+            , List.range (negate radius) radius
+            , List.range (negate radius) radius
+            ]
+    in
+    List.filterMap listToHex <| List.filter (\h -> (==) 0 (List.foldl (+) 0 h)) <| cartesianProduct ranges
 
 
 rectangularFlatTopMap : CellType -> Int -> Int -> HexHeimMap
